@@ -1,5 +1,6 @@
 import json
 from bisect import bisect_left
+from utils import tuple_add, tuple_sub
 """
 Starmade.py is a collection of various helpers for manipulating Starmade data
 """
@@ -28,7 +29,7 @@ def tier(t):
 class Block:
   """Block class, i don't know what to do just yet.
   """
-  def __init__(self, item_id):
+  def __init__(self, item_id, posx=0, posy=0, posz=0):
     # Creates a block from a supported item id
     data_index = id_map[item_id]
     data = items[data_index]
@@ -37,9 +38,9 @@ class Block:
     self.color = data['color']
     self.tier = data['tier']
     self.shape = data['shape']
-    self.posx = 0
-    self.posy = 0
-    self.posz = 0
+    self.posx = posx
+    self.posy = posy
+    self.posz = posz
 
   @classmethod
   def from_itemname(cls, name):
@@ -122,11 +123,6 @@ class Block:
 
 
 
-
-
-
-
-
 class Template:
   """Template deserialized from a .smtpl file or generated through code
   composed of blocks and connections
@@ -134,6 +130,7 @@ class Template:
   def __init__(self):
     # Creates an empty template from a supplied data source
     self.name = None
+    self.blocks = []
 
   @classmethod
   def fromSMTPL(cls, smtpl_filename):
@@ -145,18 +142,59 @@ class Template:
     # Creates a template from a correctly formatted json file
     return None
 
+  @classmethod
+  def fromBlocks(cls, blocks):
+    return None
+
+# Info Methods
+  def num_blocks(self):
+    return len(self.blocks)
+
+  def box_dimensions(self):
+    # Get min values for each axis
+    minx = min(block.posx for block in self.blocks)
+    miny = min(block.posy for block in self.blocks)
+    minz = min(block.posz for block in self.blocks)
+    mins = (minx, miny, minz)
+    print mins
+    # Get max values for each axis
+    maxx = max(block.posx for block in self.blocks)
+    maxy = max(block.posy for block in self.blocks)
+    maxz = max(block.posz for block in self.blocks)
+    maxs = (maxx, maxy, maxz)
+    print maxs
+    dif = tuple_sub(maxs, mins)
+    return tuple_add(dif, (1,1,1))
+
+  def add(self, block):
+    self.blocks.append(block)
+
+  def get_all_blocks(query):
+    # return all blocks in this template that match the given query
+    pass
+
+  def transform_all_blocks(target_block, dest_block):
+    # transforms all blocks that meet the target_block_query to meet
+    # the dest_block transform
+    pass
 
 
 
 def test():
   b = Block.from_itemname('Grey Standard Armor')
   b.move(2,2,2)
-  b.info()
+  # b.info()
   # print Block.map_id_to_name(312)
   # print [ block['name'] for block in Block.search(color='yellow',shape=2) ]
   b.change_color('blue')
-  b.info()
-  # print Block.map_name_to_id('AND-Signal')
+  # b.info()
+  t = Template()
+  t.add(Block(5))
+  t.add(Block(5, posy=1))
+  t.add(Block(5, posy=2))
+  t.add(Block(5, posz=1))
+  print t.box_dimensions()
+  print (Block.map_id_to_name(4))
 
 
 if __name__ == '__main__':

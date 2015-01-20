@@ -1,5 +1,5 @@
 import pytest
-from starmade import Block, shape, tier
+from starmade import Block, Template, shape, tier
 
 class TestBlock:
   def test_init(self):
@@ -7,6 +7,8 @@ class TestBlock:
     block2 = Block(5)
     assert block1.name == block2.name
     assert block1.id == block2.id
+    block3 = Block(5, posy=3)
+    assert block3.posy == 3
 
   def test_change_color(self):
     block = Block.from_itemname('Grey Standard Armor')
@@ -38,3 +40,24 @@ class TestBlock:
     assert block.shape == shape('block')
     block.change_shape(shape('wedge'))
     assert block.shape == shape('wedge')
+
+
+class TestTemplate:
+  def test_init(self):
+    t = Template()
+    t.add(Block(5))
+    t.add(Block(5, posy=1))
+    assert t.num_blocks() == 2
+
+  def test_box_dims(self):
+    t = Template()
+    t.add(Block(5))
+    t.add(Block(5, posy=1))
+    t.add(Block(5, posy=2))
+    assert t.box_dimensions() == (1,3,1)
+    t.add(Block(5, posz=1))
+    assert t.box_dimensions() == (1,3,2)
+    t2 = Template()
+    t2.add(Block(5, posx=-5))
+    t2.add(Block(5, posx=-4))
+    assert t2.box_dimensions() == (2,1,1)
