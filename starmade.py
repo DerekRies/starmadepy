@@ -166,6 +166,13 @@ class Template:
     dif = tuple_sub(maxs, mins)
     return tuple_add(dif, (1,1,1))
 
+  def count_by_block(self):
+    b_count = {}
+    for block in self.blocks:
+      count = b_count.get(block.name, 0) + 1
+      b_count[block.name] = count
+    print b_count
+
   def add(self, block):
     self.blocks.append(block)
 
@@ -194,7 +201,7 @@ def test():
   t.add(Block(5, posy=2))
   t.add(Block(5, posz=1))
   print t.box_dimensions()
-  print (Block.map_id_to_name(4))
+  t.count_by_block()
 
 
 if __name__ == '__main__':
