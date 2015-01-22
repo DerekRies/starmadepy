@@ -61,3 +61,11 @@ class TestTemplate:
     t2.add(Block(5, posx=-5))
     t2.add(Block(5, posx=-4))
     assert t2.box_dimensions() == (2,1,1)
+
+  def test_block_count(self):
+    t = Template()
+    t.add(Block(1))
+    t.add(Block(2))
+    t.add(Block(5))
+    block_count = t.count_by_block()
+    assert len(block_count.keys()) == 3

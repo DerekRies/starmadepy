@@ -1,6 +1,9 @@
 import json
+
 from bisect import bisect_left
-from utils import tuple_add, tuple_sub
+from utils import tuple_add, tuple_sub, plural
+from binary import BinaryStream
+
 """
 Starmade.py is a collection of various helpers for manipulating Starmade data
 """
@@ -130,15 +133,36 @@ class Template:
   def __init__(self):
     # Creates an empty template from a supplied data source
     self.name = None
+    self.header = None
     self.blocks = []
+    self.connections = []
 
   @classmethod
-  def fromSMTPL(cls, smtpl_filename):
+  def fromSMTPL(cls, smtpl_filepath):
     # Creates a template from a .smtpl file
-    return None
+    t = cls()
+    t.name = smtpl_filepath
+    print 'Deserializing %s' % smtpl_filepath
+    with open(smtpl_filepath, 'rb') as ifile:
+      stream = BinaryStream(ifile)
+      t.header = stream.readBytes(25)
+      n_blocks = stream.readInt32()
+      print 'Found %s %s' % (n_blocks, plural(n_blocks, 'block'))
+      for i in xrange(n_blocks):
+        x = stream.readInt32()
+        y = stream.readInt32()
+        z = stream.readInt32()
+        skip = stream.readBytes(2)
+        block_id = stream.readChar()
+        block = Block(block_id, posx=x, posy=y, posz=z)
+        print 'Creating Block ID:#%s, %s' % (block_id, block.name)
+        t.blocks.append(block)
+      n_connections = stream.readInt32()
+      print 'Found %s %s' % (n_connections, plural(n_connections, 'connection'))
+    return t
 
   @classmethod
-  def fromJSON(cls, json):
+  def fromJSON(cls, json_filepath):
     # Creates a template from a correctly formatted json file
     return None
 
@@ -156,13 +180,11 @@ class Template:
     miny = min(block.posy for block in self.blocks)
     minz = min(block.posz for block in self.blocks)
     mins = (minx, miny, minz)
-    print mins
     # Get max values for each axis
     maxx = max(block.posx for block in self.blocks)
     maxy = max(block.posy for block in self.blocks)
     maxz = max(block.posz for block in self.blocks)
     maxs = (maxx, maxy, maxz)
-    print maxs
     dif = tuple_sub(maxs, mins)
     return tuple_add(dif, (1,1,1))
 
@@ -171,7 +193,7 @@ class Template:
     for block in self.blocks:
       count = b_count.get(block.name, 0) + 1
       b_count[block.name] = count
-    print b_count
+    return b_count
 
   def add(self, block):
     self.blocks.append(block)
@@ -188,20 +210,16 @@ class Template:
 
 
 def test():
-  b = Block.from_itemname('Grey Standard Armor')
-  b.move(2,2,2)
+  # b = Block.from_itemname('Grey Standard Armor')
+  # b.move(2,2,2)
   # b.info()
   # print Block.map_id_to_name(312)
   # print [ block['name'] for block in Block.search(color='yellow',shape=2) ]
-  b.change_color('blue')
+  # b.change_color('blue')
   # b.info()
-  t = Template()
-  t.add(Block(5))
-  t.add(Block(5, posy=1))
-  t.add(Block(5, posy=2))
-  t.add(Block(5, posz=1))
-  print t.box_dimensions()
-  t.count_by_block()
+  t1 = Template.fromSMTPL('data/test-templates/AAAbasicgrey.smtpl')
+  print t1.count_by_block()
+  print t1.box_dimensions()
 
 
 if __name__ == '__main__':
