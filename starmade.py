@@ -48,6 +48,9 @@ class Block:
     self.posz = posz
     self.orientation = orientation
 
+  def props(self):
+    return ['color', 'tier', 'shape']
+
   @classmethod
   def from_itemname(cls, name):
     # Creates a block from a item name (string)
@@ -107,8 +110,10 @@ class Block:
       self.change_block_data(new_block)
 
   def change(self, **kwargs):
-    # TODO: Modify kwargs after it comes through to include the things its missing
-    # so that which isnt included, isn't altered
+    # TODO: Needs more tests to make sure this is working properly
+    for prop in self.props():
+      if prop not in kwargs:
+        kwargs[prop] = getattr(self, prop)
     self.change_block_data(Block.search_first(**kwargs))
 
   def move_to(self,nx=0,ny=0,nz=0):
@@ -185,7 +190,6 @@ class Template:
   def fromBlocks(cls, blocks):
     return None
 
-# Info Methods
   def num_blocks(self):
     return len(self.blocks)
 
@@ -213,8 +217,7 @@ class Template:
   def add(self, block):
     self.blocks.append(block)
 
-# Transform Operations
-  def replace(source_query, changes):
+  def replace(self, source_query, changes):
     """
     Match all blocks belonging to this template that meet
     the source query, and apply the following changes to them.
@@ -226,30 +229,46 @@ class Template:
     ex: Get all the orange wedges and turn them into blocks
     t.replace({color: 'orange', shape: 'wedge'}, {shape: 'block'})
     """
-    blocks = self.get_all(source_query)
-    return None
+    blocks = self.get_all_blocks(**source_query)
+    for block in blocks:
+      block.change(**changes)
 
-  def get_all(query):
-    """Returns all blocks that match the query provided"""
-    pass
+  def get_all_blocks(self, **kwargs):
+    """Returns all blocks that match the query provided
+      TODO: Allow for more complex filters, like ranges, or multiple options
+      for specific block properties"""
+    queried_blocks = []
+    print kwargs
+    for block in self.blocks:
+      filters = [ bool(getattr(block, key) == val) for key, val in kwargs.iteritems() ]
+      if all(filters):
+        queried_blocks.append(block)
+    return queried_blocks
 
-  def get(query):
-    """Returns the first block that matches the query provided"""
-    pass
 
 
 def test():
   b = Block.from_itemname('Grey Standard Armor')
-  # b.move(2,2,2)
-  # b.info()
-  # print Block.map_id_to_name(312)
-  # print [ block['name'] for block in Block.search(color='yellow',shape=2) ]
-  # b.change_color('blue')
-  # b.info()
-  t1 = Template.fromSMTPL('data/test-templates/AAAstandardgrey.smtpl')
-  # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
-  print t1.count_by_block()
-  print t1.box_dimensions()
+  b.move_to(2,2,2)
+  b.info()
+  b.change_color('blue')
+  b.info()
+
+  # t1 = Template.fromSMTPL('data/test-templates/AAAstandardgrey.smtpl')
+  # # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
+  # t1.get_all_blocks(color="orange")
+  # print t1.count_by_block()
+  # print t1.box_dimensions()
+
+  t = Template()
+  for x in xrange(10):
+    t.add(Block(5, posx=x))
+    t.add(Block(431, posy=x))
+  t.add(Block(432, posx=3,posy=3,posz=3))
+  assert t.num_blocks() == 21
+  t.replace({'color':'orange'}, {'color': 'blue'})
+  # t.replace({'shape': shape('wedge')}, {'color': 'red'})
+  print t.count_by_block()
 
 
 if __name__ == '__main__':

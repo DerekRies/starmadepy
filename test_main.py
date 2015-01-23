@@ -41,6 +41,13 @@ class TestBlock:
     block.change_shape(shape('wedge'))
     assert block.shape == shape('wedge')
 
+  def test_maintain_unchanged(self):
+    block = Block(5, posz=3, posx=2, posy=2)
+    block.change_color('blue')
+    assert block.posx == 2
+    assert block.posy == 2
+    assert block.posz == 3
+
 
 class TestTemplate:
   def test_init(self):
@@ -70,6 +77,32 @@ class TestTemplate:
     block_count = t.count_by_block()
     assert len(block_count.keys()) == 3
 
+  def test_block_query(self):
+    t = Template()
+    for x in xrange(10):
+      t.add(Block(5, posx=x))
+      t.add(Block(431, posy=x))
+    t.add(Block(432, posx=3,posy=3,posz=3))
+    assert t.num_blocks() == 21
+    orange_blocks = t.get_all_blocks(color='orange')
+    assert len(orange_blocks) == 11
+    orange_hulls = t.get_all_blocks(color='orange', shape=shape('block'))
+    print [b.shape for b in orange_hulls]
+    assert len(orange_hulls) == 10
+    orange_wedges = t.get_all_blocks(color='orange', shape=shape('wedge'))
+    assert len(orange_wedges) == 1
+
+  def test_block_batch_replace(self):
+    t = Template()
+    for x in xrange(10):
+      t.add(Block(5, posx=x))
+      t.add(Block(431, posy=x))
+    t.add(Block(432, posx=3,posy=3,posz=3))
+    assert t.num_blocks() == 21
+    oranges = len(t.get_all_blocks(color='orange'))
+    t.replace({'color':'orange'}, {'color': 'blue'})
+    blues = t.get_all_blocks(color='blue')
+    assert oranges == len(blues)
 
 
 class TestTemplateLoading:
