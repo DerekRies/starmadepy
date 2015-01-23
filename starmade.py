@@ -193,7 +193,7 @@ class Template:
         offset = int(offset, 2) * 256
         block_id = block_id_remainder + offset
         block = Block(block_id, posx=x, posy=y, posz=z, orientation=orientation)
-        print 'Creating Block ID:#%s, %s' % (block_id, block.name)
+        # print 'Creating Block ID:#%s, %s' % (block_id, block.name)
         t.add(block)
       n_connections = stream.readInt32()
       print 'Found %s %s' % (n_connections, plural(n_connections, 'connection'))
