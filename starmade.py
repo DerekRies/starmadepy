@@ -34,7 +34,7 @@ def tier(t):
 class Block:
   """Block class, i don't know what to do just yet.
   """
-  def __init__(self, item_id, posx=0, posy=0, posz=0, orientation=0):
+  def __init__(self, item_id, posx=0, posy=0, posz=0, orientation=11):
     # Creates a block from a supported item id
     data_index = id_map[item_id]
     data = items[data_index]
@@ -147,6 +147,24 @@ class Template:
     self.blocks = []
     self.connections = []
 
+  def save(self, filepath):
+    with open(filepath, 'wb') as ofile:
+      stream = BinaryStream(ofile)
+      stream.writeBytes(self.header)
+      stream.writeInt32(self.num_blocks())
+      for block in self.blocks:
+        stream.writeInt32(block.posx)
+        stream.writeInt32(block.posy)
+        stream.writeInt32(block.posz)
+        stream.writeChar(block.orientation)
+        id_remainder = block.id % 256
+        offset = block.id / 256
+        offset_bits = '0010' + '{0:04b}'.format(offset)
+        stream.writeUChar(int(offset_bits, 2))
+        stream.writeUChar(id_remainder)
+      stream.writeInt32(0)
+      print 'Save Complete'
+
   @classmethod
   def fromSMTPL(cls, smtpl_filepath):
     # Creates a template from a .smtpl file
@@ -248,19 +266,22 @@ class Template:
 
 
 def test():
-  b = Block.from_itemname('Grey Standard Armor')
-  b.move_to(2,2,2)
-  b.info()
-  b.change_color('blue')
-  b.info()
+  # b = Block.from_itemname('Grey Standard Armor')
+  # b.move_to(2,2,2)
+  # b.info()
+  # b.change_color('blue')
+  # b.info()
 
-  # t1 = Template.fromSMTPL('data/test-templates/AAAstandardgrey.smtpl')
+  t1 = Template.fromSMTPL('data/test-templates/testoutput.smtpl')
   # # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
   # t1.get_all_blocks(color="orange")
-  # print t1.count_by_block()
+  print t1.count_by_block()
   # print t1.box_dimensions()
 
+def write_test():
+  t1 = Template.fromSMTPL('data/test-templates/AAAstandardgrey.smtpl')
   t = Template()
+  t.header = t1.header
   for x in xrange(10):
     t.add(Block(5, posx=x))
     t.add(Block(431, posy=x))
@@ -269,7 +290,9 @@ def test():
   t.replace({'color':'orange'}, {'color': 'blue'})
   # t.replace({'shape': shape('wedge')}, {'color': 'red'})
   print t.count_by_block()
+  t.save('data/test-templates/testoutput.smtpl')
 
 
 if __name__ == '__main__':
   test()
+  # write_test()

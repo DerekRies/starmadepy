@@ -55,10 +55,10 @@ class BinaryStream:
         self.base_stream.write(value)
 
     def writeChar(self, value):
-        self.pack('>c', value)
+        self.pack('>b', value)
 
     def writeUChar(self, value):
-        self.pack('>C', value)
+        self.pack('>b', value)
 
     def writeBool(self, value):
         self.pack('>?', value)
