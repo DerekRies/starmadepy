@@ -9,3 +9,9 @@ def plural(n, s1):
     return s1 + 's'
   else:
     return s1
+
+def bits(char, nbits):
+  b = ''
+  for i in reversed(xrange(nbits)):
+    b += str((char >> i) & 1)
+  return b

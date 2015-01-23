@@ -1,7 +1,9 @@
 import json
+import binascii
+import copy
 
 from bisect import bisect_left
-from utils import tuple_add, tuple_sub, plural
+from utils import tuple_add, tuple_sub, plural, bits
 from binary import BinaryStream
 
 """
@@ -32,7 +34,7 @@ def tier(t):
 class Block:
   """Block class, i don't know what to do just yet.
   """
-  def __init__(self, item_id, posx=0, posy=0, posz=0):
+  def __init__(self, item_id, posx=0, posy=0, posz=0, orientation=0):
     # Creates a block from a supported item id
     data_index = id_map[item_id]
     data = items[data_index]
@@ -44,6 +46,7 @@ class Block:
     self.posx = posx
     self.posy = posy
     self.posz = posz
+    self.orientation = orientation
 
   @classmethod
   def from_itemname(cls, name):
@@ -73,6 +76,9 @@ class Block:
   @classmethod
   def search_first(cls, **kwargs):
     return cls.search(**kwargs)[0]
+
+  def copy(self, n_copies=1):
+    return copy.deepcopy(self)
 
   def change_block_data(self, new_block):
     for k,v in new_block.iteritems():
@@ -125,7 +131,6 @@ class Block:
     print "Armor Tier: %s" % self.tier
 
 
-
 class Template:
   """Template deserialized from a .smtpl file or generated through code
   composed of blocks and connections
@@ -152,11 +157,21 @@ class Template:
         x = stream.readInt32()
         y = stream.readInt32()
         z = stream.readInt32()
-        skip = stream.readBytes(2)
-        block_id = stream.readChar()
-        block = Block(block_id, posx=x, posy=y, posz=z)
+        # ex:
+        # 0x09 0x92 0x56
+        # Item ID: 2x256 = 512 + 86 = 598
+        # First Byte is the Orientation
+        # Second Byte is the offset, only the last 4 bits matters
+        # Third Byte is the id remainder
+        orientation = stream.readChar()
+        offset = stream.readUChar()
+        block_id_remainder = stream.readUChar()
+        offset = bits(offset, 4)
+        offset = int(offset, 2) * 256
+        block_id = block_id_remainder + offset
+        block = Block(block_id, posx=x, posy=y, posz=z, orientation=orientation)
         print 'Creating Block ID:#%s, %s' % (block_id, block.name)
-        t.blocks.append(block)
+        t.add(block)
       n_connections = stream.readInt32()
       print 'Found %s %s' % (n_connections, plural(n_connections, 'connection'))
     return t
@@ -198,26 +213,41 @@ class Template:
   def add(self, block):
     self.blocks.append(block)
 
-  def get_all_blocks(query):
-    # return all blocks in this template that match the given query
+# Transform Operations
+  def replace(source_query, changes):
+    """
+    Match all blocks belonging to this template that meet
+    the source query, and apply the following changes to them.
+
+    ex: Get all the orange blocks, and make them blue
+    t = Template()...
+    t.replace({color: 'orange'}, {color: 'blue'})
+
+    ex: Get all the orange wedges and turn them into blocks
+    t.replace({color: 'orange', shape: 'wedge'}, {shape: 'block'})
+    """
+    blocks = self.get_all(source_query)
+    return None
+
+  def get_all(query):
+    """Returns all blocks that match the query provided"""
     pass
 
-  def transform_all_blocks(target_block, dest_block):
-    # transforms all blocks that meet the target_block_query to meet
-    # the dest_block transform
+  def get(query):
+    """Returns the first block that matches the query provided"""
     pass
-
 
 
 def test():
-  # b = Block.from_itemname('Grey Standard Armor')
+  b = Block.from_itemname('Grey Standard Armor')
   # b.move(2,2,2)
   # b.info()
   # print Block.map_id_to_name(312)
   # print [ block['name'] for block in Block.search(color='yellow',shape=2) ]
   # b.change_color('blue')
   # b.info()
-  t1 = Template.fromSMTPL('data/test-templates/AAAbasicgrey.smtpl')
+  t1 = Template.fromSMTPL('data/test-templates/AAAstandardgrey.smtpl')
+  # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
   print t1.count_by_block()
   print t1.box_dimensions()
 

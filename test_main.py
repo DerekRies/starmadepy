@@ -69,3 +69,15 @@ class TestTemplate:
     t.add(Block(5))
     block_count = t.count_by_block()
     assert len(block_count.keys()) == 3
+
+
+
+class TestTemplateLoading:
+  def test_small_armors(self):
+    t1 = Template.fromSMTPL('data/test-templates/AAAstandardgrey.smtpl')
+    assert len(t1.blocks) == 1
+    assert t1.blocks[0].id == 5
+    t2 = Template.fromSMTPL('data/test-templates/AAAbasicgrey.smtpl')
+    assert t2.blocks[0].id == 598
+    t3 = Template.fromSMTPL('data/test-templates/AAApossiblesalvage.smtpl')
+    assert t3.blocks[0].id == 4
