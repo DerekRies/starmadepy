@@ -119,3 +119,7 @@ class TestTemplateLoading:
     assert t2.blocks[0].id == 598
     t3 = Template.fromSMTPL('data/test-templates/AAApossiblesalvage.smtpl')
     assert t3.blocks[0].id == 4
+
+  def test_logic_blocks(self):
+    t1 = Template.fromSMTPL('data/test-templates/XOR Gate.smtpl')
+    assert t1.num_blocks() == 8

@@ -190,13 +190,21 @@ class Template:
         # 0x09 0x92 0x56
         # Item ID: 2x256 = 512 + 86 = 598
         # First Byte is the Orientation
-        # Second Byte is the offset, only the last 4 bits matters
+        # Second Byte is the offset, only the last 4 bits (OLD, now
+        # know this is the last 2 bits) matters
         # Third Byte is the id remainder
         orientation = stream.readChar()
         offset = stream.readUChar()
         block_id_remainder = stream.readUChar()
-        offset = bits(offset, 4)
-        offset = int(offset, 2) * 256
+
+        # Apparently after more trial and error, only the last 2 bits
+        # are important. This needs a bit more testing though just to
+        # make sure.
+        # offset = bits(offset, 4)
+        offset = bits(offset, 2)
+        offset = int(offset, 2)
+        offset = offset * 256
+
         block_id = block_id_remainder + offset
         block = Block(block_id, posx=x, posy=y, posz=z, orientation=orientation)
         # print 'Creating Block ID:#%s, %s' % (block_id, block.name)
@@ -281,7 +289,7 @@ def test():
   # b.change_color('blue')
   # b.info()
 
-  t1 = Template.fromSMTPL('data/test-templates/testoutput.smtpl')
+  t1 = Template.fromSMTPL('data/templates/Wedge Room (top left).smtpl')
   # # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
   # t1.get_all_blocks(color="orange")
   print t1.count_by_block()
