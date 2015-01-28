@@ -104,6 +104,11 @@ class TestTemplate:
     blues = t.get_all_blocks(color='blue')
     assert oranges == len(blues)
 
+  def test_empty(self):
+    t = Template()
+    d = t.box_dimensions()
+    b = t.count_by_block()
+
 
 class TestTemplateLoading:
   def test_small_armors(self):

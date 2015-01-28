@@ -147,6 +147,10 @@ class Template:
     self.blocks = []
     self.connections = []
 
+  def empty(self):
+    self.blocks = []
+    self.connections = []
+
   def save(self, filepath):
     with open(filepath, 'wb') as ofile:
       stream = BinaryStream(ofile)
@@ -213,6 +217,8 @@ class Template:
 
   def box_dimensions(self):
     # Get min values for each axis
+    if self.num_blocks() == 0:
+      return (0,0,0)
     minx = min(block.posx for block in self.blocks)
     miny = min(block.posy for block in self.blocks)
     minz = min(block.posz for block in self.blocks)
@@ -227,9 +233,10 @@ class Template:
 
   def count_by_block(self):
     b_count = {}
-    for block in self.blocks:
-      count = b_count.get(block.name, 0) + 1
-      b_count[block.name] = count
+    if self.num_blocks() != 0:
+      for block in self.blocks:
+        count = b_count.get(block.name, 0) + 1
+        b_count[block.name] = count
     return b_count
 
   def add(self, block):
