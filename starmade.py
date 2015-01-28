@@ -166,6 +166,8 @@ class Template:
         offset_bits = '0010' + '{0:04b}'.format(offset)
         stream.writeUChar(int(offset_bits, 2))
         stream.writeUChar(id_remainder)
+      # Writing the Connections portion of the file
+      # Connections not supported yet so just writing 4 blank bytes
       stream.writeInt32(0)
       print 'Save Complete'
 
