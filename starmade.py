@@ -145,6 +145,7 @@ class Template:
     self.name = None
     self.header = None
     self.blocks = []
+    # Connections will be tuples with the master first and the slave second
     self.connections = []
 
   def empty(self):
@@ -182,13 +183,14 @@ class Template:
       t.header = stream.readBytes(25)
       n_blocks = stream.readInt32()
       print 'Found %s %s' % (n_blocks, plural(n_blocks, 'block'))
+      # Template Blocks
       for i in xrange(n_blocks):
         x = stream.readInt32()
         y = stream.readInt32()
         z = stream.readInt32()
+        # Block ID Bytes
         # ex:
         # 0x09 0x92 0x56
-        # Item ID: 2x256 = 512 + 86 = 598
         # First Byte is the Orientation
         # Second Byte is the offset, only the last 4 bits (OLD, now
         # know this is the last 2 bits) matters
@@ -207,9 +209,25 @@ class Template:
 
         block_id = block_id_remainder + offset
         block = Block(block_id, posx=x, posy=y, posz=z, orientation=orientation)
-        # print 'Creating Block ID:#%s, %s' % (block_id, block.name)
         t.add(block)
       n_connections = stream.readInt32()
+      # Template Connections
+      for j in xrange(n_connections):
+        unknown_filler = stream.readInt16()
+        master_z = stream.readInt16()
+        master_y = stream.readInt16()
+        master_x = stream.readInt16()
+        master_pos = (master_x, master_y, master_z)
+
+        unknown_filler2 = stream.readInt32()
+        unknown_filler3 = stream.readInt16()
+
+        slave_z = stream.readInt16()
+        slave_y = stream.readInt16()
+        slave_x = stream.readInt16()
+        slave_pos = (slave_x, slave_y, slave_z)
+        t.connect_blocks_at(master_pos, slave_pos)
+
       print 'Found %s %s' % (n_connections, plural(n_connections, 'connection'))
     return t
 
@@ -224,6 +242,9 @@ class Template:
 
   def num_blocks(self):
     return len(self.blocks)
+
+  def num_connections(self):
+    return len(self.connections)
 
   def box_dimensions(self):
     # Get min values for each axis
@@ -273,13 +294,34 @@ class Template:
       TODO: Allow for more complex filters, like ranges, or multiple options
       for specific block properties"""
     queried_blocks = []
-    print kwargs
+    # print kwargs
     for block in self.blocks:
       filters = [ bool(getattr(block, key) == val) for key, val in kwargs.iteritems() ]
       if all(filters):
         queried_blocks.append(block)
     return queried_blocks
 
+  def get_block_at(self, x, y, z):
+    pos_args = {'posx': x, 'posy': y, 'posz': z}
+    blocks = self.get_all_blocks(**pos_args)
+    if len(blocks):
+      return blocks[0]
+    return None
+
+  def connect_blocks(self, master, slave):
+    """Creates a connection pair in the template between two blocks, a master
+    and a slave. These are actual Block instances.
+    """
+    self.connections.append((master, slave))
+
+  def connect_blocks_at(self, master_pos, slave_pos):
+    """Creates a connection pair in the template between two blocks that are
+    specified by their coordinates. master_pos and slave_pos should be a
+    tuple like (x,y,z)
+    """
+    master = self.get_block_at(*master_pos)
+    slave = self.get_block_at(*slave_pos)
+    self.connect_blocks(master, slave)
 
 
 def test():
@@ -289,10 +331,18 @@ def test():
   # b.change_color('blue')
   # b.info()
 
-  t1 = Template.fromSMTPL('data/templates/Wedge Room (top left).smtpl')
+  t1 = Template.fromSMTPL('data/templates/Pulse.smtpl')
   # # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
   # t1.get_all_blocks(color="orange")
   print t1.count_by_block()
+  for pair in t1.connections:
+    if pair[0] is None:
+      print "None --> %s" % pair[1].name
+    elif pair[1] is None:
+      print "%s --> None" % pair[0].name
+    else:
+      print "%s --> %s" % (pair[0].name, pair[1].name)
+    # print "%s --> %s" % pair
   # print t1.box_dimensions()
 
 def write_test():

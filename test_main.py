@@ -92,6 +92,17 @@ class TestTemplate:
     orange_wedges = t.get_all_blocks(color='orange', shape=shape('wedge'))
     assert len(orange_wedges) == 1
 
+  def test_block_pos_query(self):
+    t = Template()
+    block1 = Block(5)
+    block1.move_to(4,7,3)
+    block2 = Block(5)
+    block2.move_to(3,3,3)
+    t.add(block1)
+    t.add(block2)
+    compare_block = t.get_block_at(3,3,3)
+    assert compare_block == block2
+
   def test_block_batch_replace(self):
     t = Template()
     for x in xrange(10):
@@ -108,6 +119,20 @@ class TestTemplate:
     t = Template()
     d = t.box_dimensions()
     b = t.count_by_block()
+    assert True
+
+
+class TestTemplateConnections:
+  def test_read_connections(self):
+    t1 = Template.fromSMTPL('data/test-templates/XOR Gate.smtpl')
+    assert t1.num_connections() == 6
+
+  def test_make_connections(self):
+    t = Template()
+    t.add(Block(5))
+    t.add(Block(5, posy=1))
+    t.connect_blocks_at((0,0,0), (0,1,0))
+    assert t.num_connections() == 1
 
 
 class TestTemplateLoading:
