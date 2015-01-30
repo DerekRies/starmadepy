@@ -34,7 +34,7 @@ def tier(t):
 class Block:
   """Block class, i don't know what to do just yet.
   """
-  def __init__(self, item_id, posx=0, posy=0, posz=0, orientation=11):
+  def __init__(self, item_id, posx=0, posy=0, posz=0, orientation=0, active=False):
     # Creates a block from a supported item id
     data_index = id_map[item_id]
     data = items[data_index]
@@ -47,6 +47,10 @@ class Block:
     self.posy = posy
     self.posz = posz
     self.orientation = orientation
+    # For my purposes I'll be representing both ON and OPEN as a True state
+    # OFF and Closed will be represented as a False state
+    self.active = active
+    self.door = data.get('door', False)
 
   def props(self):
     return ['color', 'tier', 'shape']
@@ -79,6 +83,25 @@ class Block:
   @classmethod
   def search_first(cls, **kwargs):
     return cls.search(**kwargs)[0]
+
+  # Active State Methods
+  # Opening and Closing are really just aliases that might throw an
+  # exception later if used by Blocks that can't be made invisible
+  # by opening them
+  def on(self):
+    self.active = True
+
+  def open(self):
+    self.on()
+
+  def off(self):
+    self.active = False
+
+  def close(self):
+    self.off()
+
+  def toggle(self):
+    self.active = not self.active
 
   def copy(self, n_copies=1):
     return copy.deepcopy(self)
@@ -134,6 +157,7 @@ class Block:
     print "Item Color: %s" % self.color
     print "Item Shape: %s" % self.shape
     print "Armor Tier: %s" % self.tier
+    print "Door: %s" % self.door
 
 
 class Template:
@@ -161,7 +185,24 @@ class Template:
         stream.writeInt32(block.posx)
         stream.writeInt32(block.posy)
         stream.writeInt32(block.posz)
-        stream.writeChar(block.orientation)
+
+        # Need to take the orientation as 4 bits and the active state
+        # as 4 bits, concatenate them, and then write that as a UChar
+        active_bits = '1000'
+        if block.active and not block.door:
+          # Block On
+          active_bits = '0000'
+        elif block.active and block.door:
+          # Door Open
+          active_bits = '1001'
+        elif not block.active and block.door:
+          # Door Closed
+          active_bits = '0001'
+        orientation_bits = format(block.orientation, '#06b')[2:]
+        state = int(orientation_bits + active_bits, 2)
+        stream.writeUChar(state)
+        # stream.writeUChar(block.orientation)
+
         id_remainder = block.id % 256
         offset = block.id / 256
         offset_bits = '0010' + '{0:04b}'.format(offset)
@@ -171,6 +212,28 @@ class Template:
       # Connections not supported yet so just writing 4 blank bytes
       stream.writeInt32(0)
       print 'Save Complete'
+
+  def mock_save(self):
+    for block in self.blocks:
+      # Block Off
+      active_bits = '1000'
+      if block.active and not block.door:
+        # Block On
+        active_bits = '0000'
+      elif block.active and block.door:
+        # Door Open
+        active_bits = '1001'
+      elif not block.active and block.door:
+        # Door Closed
+        active_bits = '0001'
+      orientation_bits = format(block.orientation, '#06b')[2:]
+      print '-------------------------------'
+      print 'BLOCK: %s' % block.name
+      print 'Active: %s' % block.active
+      print 'Orientation: %s' % block.orientation
+      print 'Active as bits: %s' % active_bits
+      print 'Orientation as bits: %s' % orientation_bits
+      print 'State as Byte: %s' % hex(int(orientation_bits + active_bits, 2))
 
   @classmethod
   def fromSMTPL(cls, smtpl_filepath):
@@ -195,7 +258,17 @@ class Template:
         # Second Byte is the offset, only the last 4 bits (OLD, now
         # know this is the last 2 bits) matters
         # Third Byte is the id remainder
-        orientation = stream.readChar()
+        state_byte = stream.readChar()
+        state_bits = bits(state_byte, 8)
+
+        orientation = int(state_bits[0:4], 2)
+        print 'Orientation: %s' % orientation
+        active = state_bits[4:]
+        active = int(active, 2)
+        print 'Active: %s' % active
+        active = False if active in [8,1] else True
+        print 'Active: %s' % active
+
         offset = stream.readUChar()
         block_id_remainder = stream.readUChar()
 
@@ -208,7 +281,8 @@ class Template:
         offset = offset * 256
 
         block_id = block_id_remainder + offset
-        block = Block(block_id, posx=x, posy=y, posz=z, orientation=orientation)
+        block = Block(block_id, posx=x, posy=y, posz=z,
+          orientation=orientation, active=active)
         t.add(block)
       n_connections = stream.readInt32()
       # Template Connections
@@ -323,26 +397,37 @@ class Template:
     slave = self.get_block_at(*slave_pos)
     self.connect_blocks(master, slave)
 
+  def _print_connections(self):
+    """Debugging method to make seeing the connections between blocks
+    visual and easy
+    """
+    for pair in self.connections:
+      if pair[0] is None:
+        print "None --> %s" % pair[1].name
+      elif pair[1] is None:
+        print "%s --> None" % pair[0].name
+      else:
+        print "%s --> %s" % (pair[0].name, pair[1].name)
+
+  def _print_block_states(self):
+    """Debugging method to make seeing which blocks are currently active
+    or open, easier"""
+    for block in self.blocks:
+      print '{0}: {1}'.format(block.name, block.active)
+
 
 def test():
-  # b = Block.from_itemname('Grey Standard Armor')
+  # b = Block.from_itemname('Plex Door')
   # b.move_to(2,2,2)
   # b.info()
-  # b.change_color('blue')
-  # b.info()
 
-  t1 = Template.fromSMTPL('data/templates/Pulse.smtpl')
+  t1 = Template.fromSMTPL('data/test-templates/Pulse.smtpl')
   # # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
   # t1.get_all_blocks(color="orange")
-  print t1.count_by_block()
-  for pair in t1.connections:
-    if pair[0] is None:
-      print "None --> %s" % pair[1].name
-    elif pair[1] is None:
-      print "%s --> None" % pair[0].name
-    else:
-      print "%s --> %s" % (pair[0].name, pair[1].name)
-    # print "%s --> %s" % pair
+  # print t1.count_by_block()
+  # t1._print_connections()
+  # t1._print_block_states()
+  # t1.mock_save()
   # print t1.box_dimensions()
 
 def write_test():

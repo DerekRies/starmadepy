@@ -1,5 +1,7 @@
 import pytest
+import os
 from starmade import Block, Template, shape, tier
+
 
 class TestBlock:
   def test_init(self):
@@ -9,6 +11,19 @@ class TestBlock:
     assert block1.id == block2.id
     block3 = Block(5, posy=3)
     assert block3.posy == 3
+
+  def test_init_active_state(self):
+    # Blocks should always start out as off or closed (visible)
+    b = Block.from_itemname('Activation Module')
+    b2 = Block.from_itemname('Plex Door')
+    assert b.active == False
+    assert b2.active == False
+    b.toggle()
+    assert b.active == True
+    b.on()
+    assert b.active == True
+    b.off()
+    assert b.active == False
 
   def test_change_color(self):
     block = Block.from_itemname('Grey Standard Armor')
@@ -148,3 +163,19 @@ class TestTemplateLoading:
   def test_logic_blocks(self):
     t1 = Template.fromSMTPL('data/test-templates/XOR Gate.smtpl')
     assert t1.num_blocks() == 8
+
+  def test_active_states(self):
+    t1 = Template.fromSMTPL('data/test-templates/Pulse.smtpl')
+    assert t1.get_all_blocks(name="NOT-Signal")[0].active == True
+    assert len(t1.get_all_blocks(active=False)) == 3
+
+  @pytest.mark.filewrite
+  def test_save_active_states(self):
+    saved_name = 'data/test-templates/Pulse (saved).smtpl'
+    t1 = Template.fromSMTPL('data/test-templates/Pulse.smtpl')
+    t1.save(saved_name)
+    t2 = Template.fromSMTPL(saved_name)
+    t1not = t1.get_all_blocks(name="NOT-Signal")[0]
+    t2not = t2.get_all_blocks(name="NOT-Signal")[0]
+    os.remove(saved_name)
+    assert t1not.active == t2not.active
