@@ -3,6 +3,16 @@ import os
 from starmade import Block, Template, shape, tier
 
 
+
+""" To run these tests simply run the command 'py.test' from the root directory.
+This will run all the tests so it is recommended that if you are running the tests
+automatically upon filechanges that you run the command "py.test -m 'not filewrite'".
+This will exclude tests that make sure writing of files is working, which will also
+cause the tests to be rerun infinitely when using something like 'rerun' to
+automatically rerun those tests.
+"""
+
+
 class TestBlock:
   def test_init(self):
     block1 = Block.from_itemname('Grey Standard Armor')

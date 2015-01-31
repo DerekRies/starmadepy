@@ -150,6 +150,9 @@ class Block:
     # Should be used to move a block in relation to its current position
     self.move_to(*args)
 
+  def get_position(self):
+    return (self.posx, self.posy, self.posz)
+
   def info(self):
     print "Item Name: %s" % self.name
     print "Item ID: %s" % self.id
@@ -262,12 +265,12 @@ class Template:
         state_bits = bits(state_byte, 8)
 
         orientation = int(state_bits[0:4], 2)
-        print 'Orientation: %s' % orientation
+        # print 'Orientation: %s' % orientation
         active = state_bits[4:]
         active = int(active, 2)
-        print 'Active: %s' % active
+        # print 'Active: %s' % active
         active = False if active in [8,1] else True
-        print 'Active: %s' % active
+        # print 'Active: %s' % active
 
         offset = stream.readUChar()
         block_id_remainder = stream.readUChar()
@@ -285,6 +288,8 @@ class Template:
           orientation=orientation, active=active)
         t.add(block)
       n_connections = stream.readInt32()
+      print "File says: %s connections" % n_connections
+
       # Template Connections
       for j in xrange(n_connections):
         unknown_filler = stream.readInt16()
@@ -295,12 +300,14 @@ class Template:
 
         unknown_filler2 = stream.readInt32()
         unknown_filler3 = stream.readInt16()
+        print unknown_filler2
+        print unknown_filler3
 
         slave_z = stream.readInt16()
         slave_y = stream.readInt16()
         slave_x = stream.readInt16()
         slave_pos = (slave_x, slave_y, slave_z)
-        t.connect_blocks_at(master_pos, slave_pos)
+        t.connect_blocks_at(slave_pos, master_pos)
 
       print 'Found %s %s' % (n_connections, plural(n_connections, 'connection'))
     return t
@@ -396,6 +403,10 @@ class Template:
     master = self.get_block_at(*master_pos)
     slave = self.get_block_at(*slave_pos)
     self.connect_blocks(master, slave)
+    self._print_connection(master_pos, slave_pos)
+
+  def _print_connection(self, pos_a, pos_b):
+    print str(pos_a) + ' --> ' + str(pos_b)
 
   def _print_connections(self):
     """Debugging method to make seeing the connections between blocks
@@ -403,11 +414,15 @@ class Template:
     """
     for pair in self.connections:
       if pair[0] is None:
-        print "None --> %s" % pair[1].name
+        bpos = str(pair[1].get_position())
+        print "None --> %s (%s)" % (pair[1].name, bpos)
       elif pair[1] is None:
-        print "%s --> None" % pair[0].name
+        apos = str(pair[0].get_position())
+        print "%s (%s) --> None" % (pair[0].name, apos)
       else:
-        print "%s --> %s" % (pair[0].name, pair[1].name)
+        apos = str(pair[0].get_position())
+        bpos = str(pair[1].get_position())
+        print "%s (%s) --> %s (%s)" % (pair[0].name, apos, pair[1].name, bpos)
 
   def _print_block_states(self):
     """Debugging method to make seeing which blocks are currently active
@@ -421,11 +436,19 @@ def test():
   # b.move_to(2,2,2)
   # b.info()
 
-  t1 = Template.fromSMTPL('data/test-templates/Pulse.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/Pulse.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 1.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 2.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 3.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 4.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 5.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary1.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary2.smtpl')
+  t1 = Template.fromSMTPL('data/test-templates/connections/hailmary3.smtpl')
   # # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
   # t1.get_all_blocks(color="orange")
   # print t1.count_by_block()
-  # t1._print_connections()
+  t1._print_connections()
   # t1._print_block_states()
   # t1.mock_save()
   # print t1.box_dimensions()
