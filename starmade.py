@@ -211,32 +211,41 @@ class Template:
         offset_bits = '0010' + '{0:04b}'.format(offset)
         stream.writeUChar(int(offset_bits, 2))
         stream.writeUChar(id_remainder)
+      # stream.writeInt32(0)
       # Writing the Connections portion of the file
       # Connections not supported yet so just writing 4 blank bytes
-      stream.writeInt32(0)
+      connection_groups = self.get_connection_groups()
+      stream.writeInt32(len(connection_groups))
+      for group in connection_groups:
+        master = group[0]
+        slaves = group[1:]
+        stream.writeInt16(0)
+        stream.writeInt16(master.posz)
+        stream.writeInt16(master.posy)
+        stream.writeInt16(master.posx)
+        stream.writeInt32(len(slaves))
+        for slave in slaves:
+          stream.writeInt16(0)
+          stream.writeInt16(slave.posz)
+          stream.writeInt16(slave.posy)
+          stream.writeInt16(slave.posx)
       print 'Save Complete'
 
-  def mock_save(self):
-    for block in self.blocks:
-      # Block Off
-      active_bits = '1000'
-      if block.active and not block.door:
-        # Block On
-        active_bits = '0000'
-      elif block.active and block.door:
-        # Door Open
-        active_bits = '1001'
-      elif not block.active and block.door:
-        # Door Closed
-        active_bits = '0001'
-      orientation_bits = format(block.orientation, '#06b')[2:]
-      print '-------------------------------'
-      print 'BLOCK: %s' % block.name
-      print 'Active: %s' % block.active
-      print 'Orientation: %s' % block.orientation
-      print 'Active as bits: %s' % active_bits
-      print 'Orientation as bits: %s' % orientation_bits
-      print 'State as Byte: %s' % hex(int(orientation_bits + active_bits, 2))
+  def get_connection_groups(self):
+    connection_groups = []
+    last_master = None
+    cur_pos = -1
+    for pair in sorted(self.connections, key=lambda p: p[1].get_position()):
+      master = pair[1]
+      slave = pair[0]
+      if master != last_master:
+        cur_pos += 1
+        group = [master, slave]
+        connection_groups.append(group)
+        last_master = master
+      else:
+        connection_groups[cur_pos].append(slave)
+    return connection_groups
 
   @classmethod
   def fromSMTPL(cls, smtpl_filepath):
@@ -444,13 +453,14 @@ def test():
   # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 3.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 4.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 5.smtpl')
-  t1 = Template.fromSMTPL('data/test-templates/connections/hailmary1.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary1.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary2.smtpl')
-  # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary3.smtpl')
+  t1 = Template.fromSMTPL('data/test-templates/connections/hailmary3.smtpl')
   # # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
   # t1.get_all_blocks(color="orange")
   # print t1.count_by_block()
   t1._print_connections()
+  print len(t1.get_connection_groups())
   # t1._print_block_states()
   # t1.mock_save()
   # print t1.box_dimensions()

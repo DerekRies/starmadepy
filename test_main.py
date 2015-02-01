@@ -183,12 +183,16 @@ class TestTemplateLoading:
     assert len(t1.get_all_blocks(active=False)) == 3
 
   @pytest.mark.filewrite
-  def test_save_active_states(self):
-    saved_name = 'data/test-templates/Pulse (saved).smtpl'
-    t1 = Template.fromSMTPL('data/test-templates/Pulse.smtpl')
+  def test_save_data(self):
+    saved_name = 'data/test-templates/connections/pulse test 5 (saved).smtpl'
+    t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 5.smtpl')
     t1.save(saved_name)
     t2 = Template.fromSMTPL(saved_name)
     t1not = t1.get_all_blocks(name="NOT-Signal")[0]
     t2not = t2.get_all_blocks(name="NOT-Signal")[0]
     os.remove(saved_name)
+    # Make sure active states on blocks are being saved correctly
     assert t1not.active == t2not.active
+    assert t1.num_blocks() == t2.num_blocks()
+    # Make sure connections between blocks are saved
+    assert t1.num_connections() == t2.num_connections()
