@@ -287,29 +287,31 @@ class Template:
         block = Block(block_id, posx=x, posy=y, posz=z,
           orientation=orientation, active=active)
         t.add(block)
-      n_connections = stream.readInt32()
-      print "File says: %s connections" % n_connections
+      n_connection_groups = stream.readInt32()
+      print "File says: %s connection groups" % n_connection_groups
 
       # Template Connections
-      for j in xrange(n_connections):
+      for j in xrange(n_connection_groups):
         unknown_filler = stream.readInt16()
         master_z = stream.readInt16()
         master_y = stream.readInt16()
         master_x = stream.readInt16()
         master_pos = (master_x, master_y, master_z)
 
-        unknown_filler2 = stream.readInt32()
-        unknown_filler3 = stream.readInt16()
-        print unknown_filler2
-        print unknown_filler3
+        n_connections = stream.readInt32()
+        print n_connections
 
-        slave_z = stream.readInt16()
-        slave_y = stream.readInt16()
-        slave_x = stream.readInt16()
-        slave_pos = (slave_x, slave_y, slave_z)
-        t.connect_blocks_at(slave_pos, master_pos)
+        for x in xrange(n_connections):
+          unknown_filler3 = stream.readInt16()
+          # print unknown_filler3
 
-      print 'Found %s %s' % (n_connections, plural(n_connections, 'connection'))
+          slave_z = stream.readInt16()
+          slave_y = stream.readInt16()
+          slave_x = stream.readInt16()
+          slave_pos = (slave_x, slave_y, slave_z)
+          t.connect_blocks_at(slave_pos, master_pos)
+
+
     return t
 
   @classmethod
@@ -442,9 +444,9 @@ def test():
   # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 3.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 4.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 5.smtpl')
-  # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary1.smtpl')
+  t1 = Template.fromSMTPL('data/test-templates/connections/hailmary1.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary2.smtpl')
-  t1 = Template.fromSMTPL('data/test-templates/connections/hailmary3.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary3.smtpl')
   # # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
   # t1.get_all_blocks(color="orange")
   # print t1.count_by_block()
