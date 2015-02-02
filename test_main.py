@@ -196,3 +196,17 @@ class TestTemplateLoading:
     assert t1.num_blocks() == t2.num_blocks()
     # Make sure connections between blocks are saved
     assert t1.num_connections() == t2.num_connections()
+
+  def test_save_new_data(self):
+    saved_name = 'data/test-templates/generate.smtpl'
+    t1 = Template()
+    b1 = Block.from_itemname('Activation Module')
+    b2 = Block(409, posy=1)
+    t1.connect_blocks(b1, b2)
+    t1.add(b1)
+    t1.add(b2)
+    t1.save(saved_name)
+    t2 = Template.fromSMTPL(saved_name)
+    os.remove(saved_name)
+    assert t1.num_blocks() == t2.num_blocks()
+    assert t1.num_connections() == t2.num_connections()

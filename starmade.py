@@ -174,6 +174,10 @@ class Template:
     self.blocks = []
     # Connections will be tuples with the master first and the slave second
     self.connections = []
+    # Header Info
+    self.version = 1
+    self.bound_lower = None
+    self.bound_upper = None
 
   def empty(self):
     self.blocks = []
@@ -182,7 +186,23 @@ class Template:
   def save(self, filepath):
     with open(filepath, 'wb') as ofile:
       stream = BinaryStream(ofile)
-      stream.writeBytes(self.header)
+      # stream.writeBytes(self.header)
+      stream.writeUChar(self.version)
+
+      if self.bound_lower is None or self.bound_upper is None:
+        # create the bounds
+        self.bound_lower = (0,0,0)
+        self.bound_upper = self.box_dimensions()
+
+      blx, bly, blz = self.bound_lower
+      bux, buy, buz = self.bound_upper
+      stream.writeInt32(blx)
+      stream.writeInt32(bly)
+      stream.writeInt32(blz)
+      stream.writeInt32(bux)
+      stream.writeInt32(buy)
+      stream.writeInt32(buz)
+
       stream.writeInt32(self.num_blocks())
       for block in self.blocks:
         stream.writeInt32(block.posx)
@@ -255,7 +275,12 @@ class Template:
     print 'Deserializing %s' % smtpl_filepath
     with open(smtpl_filepath, 'rb') as ifile:
       stream = BinaryStream(ifile)
-      t.header = stream.readBytes(25)
+      # t.header = stream.readBytes(25)
+      t.version = stream.readUChar()
+      t.bound_lower = (
+        stream.readInt32(),stream.readInt32(),stream.readInt32())
+      t.bound_upper = (
+        stream.readInt32(),stream.readInt32(),stream.readInt32())
       n_blocks = stream.readInt32()
       print 'Found %s %s' % (n_blocks, plural(n_blocks, 'block'))
       # Template Blocks
@@ -448,19 +473,23 @@ def test():
   # b.info()
 
   # t1 = Template.fromSMTPL('data/test-templates/Pulse.smtpl')
-  # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 1.smtpl')
+  t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 1.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 2.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 3.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 4.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 5.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary1.smtpl')
   # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary2.smtpl')
-  t1 = Template.fromSMTPL('data/test-templates/connections/hailmary3.smtpl')
-  # # t1 = Template.fromSMTPL('data/templates/Truss Railing.smtpl')
+  # t1 = Template.fromSMTPL('data/test-templates/connections/hailmary3.smtpl')
+  # t1 = Template.fromSMTPL('../starmade-tools/data/templates/Truss Railing.smtpl')
   # t1.get_all_blocks(color="orange")
   # print t1.count_by_block()
   t1._print_connections()
-  print len(t1.get_connection_groups())
+  # print len(t1.get_connection_groups())
+  print t1.version
+  print t1.bound_lower
+  print t1.bound_upper
+  print t1.box_dimensions()
   # t1._print_block_states()
   # t1.mock_save()
   # print t1.box_dimensions()

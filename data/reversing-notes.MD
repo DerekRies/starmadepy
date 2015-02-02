@@ -3,6 +3,8 @@
 Just some general notes I take as I go through the file types. Much of the file was already completed thanks to der_scheme on the starmade-dock forums.
 [http://starmadedock.net/threads/the-starmade-template-file-format-smtpl.2994/](http://starmadedock.net/threads/the-starmade-template-file-format-smtpl.2994/)
 
+also found this wiki page with some good info that would have been nice to find before I spent anytime trying to find this stuff out. [http://starmadepedia.net/wiki/Blueprint_File_Formats](http://starmadepedia.net/wiki/Blueprint_File_Formats)
+
 Each block has:
  - 32bit int for x position
  - 32bit int for y position
