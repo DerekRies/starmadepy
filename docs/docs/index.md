@@ -25,10 +25,7 @@ It is recommended that you use virtualenv or the virtualenvwrapper.
 
     pip install starmadepy
 
-## Documentation
-coming soon
 
-## Contributing
-coming soon
+## Projects using Starmadepy
 
-
+Coming soon
