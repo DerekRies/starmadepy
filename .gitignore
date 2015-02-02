@@ -3,4 +3,4 @@ __pycache__
 data/templates
 quickedit.py
 pic2tpl.py
-docs/site
+site
