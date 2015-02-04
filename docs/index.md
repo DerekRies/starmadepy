@@ -13,6 +13,7 @@ Starmadepy is a simple python library that makes parsing and manipulating Starma
 
     # Loads a template file named sometemplatefile.smtpl
     # Replaces all grey colored blocks, with orange equivalents
+
     template = starmade.Template.fromSMTPL('sometemplatefile.smtpl')
     template.replace({'color': 'grey'}, {'color': 'orange'})
 
