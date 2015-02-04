@@ -1,8 +1,10 @@
-# Starmadepy v0.1
+Starmadepy v0.1
+===================
 
 A Python library for manipulating Starmade game data
 
-## Overview
+Overview
+-------------------
 
 Starmadepy is a simple python library that makes parsing and manipulating Starmade game data easy. As this project is fairly new, the only file type that is currently supported is the `.smtpl`, or **Template** file type.
 
@@ -15,13 +17,15 @@ Starmadepy is a simple python library that makes parsing and manipulating Starma
     template.replace({'color': 'grey'}, {'color': 'orange'})
 
 
-## Installation
+Installation
+-------------------
 
 It is recommended that you use virtualenv or the virtualenvwrapper.
 
     pip install starmadepy
 
 
-## Projects using Starmadepy
+Projects using Starmadepy
+-------------------
 
 Coming soon
