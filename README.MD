@@ -6,6 +6,8 @@ A Python library for manipulating Starmade game data
 
 Starmadepy is a simple python library that makes parsing and manipulating Starmade game data easy. As this project is fairly new, the only file type that is currently supported is the `.smtpl`, or **Template** file type.
 
+[Docs](http://starmadepy.readthedocs.org/en/latest/)
+
 
 ## Example
 
@@ -25,8 +27,6 @@ It is recommended that you use virtualenv or the virtualenvwrapper.
 
     pip install starmadepy
 
-## Documentation
-coming soon
 
 ## Contributing
 coming soon

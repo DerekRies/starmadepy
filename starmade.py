@@ -186,28 +186,18 @@ class Template:
   def save(self, filepath):
     with open(filepath, 'wb') as ofile:
       stream = BinaryStream(ofile)
-      # stream.writeBytes(self.header)
       stream.writeUChar(self.version)
 
       if self.bound_lower is None or self.bound_upper is None:
         # create the bounds
         self.bound_lower = (0,0,0)
         self.bound_upper = self.box_dimensions()
-
-      blx, bly, blz = self.bound_lower
-      bux, buy, buz = self.bound_upper
-      stream.writeInt32(blx)
-      stream.writeInt32(bly)
-      stream.writeInt32(blz)
-      stream.writeInt32(bux)
-      stream.writeInt32(buy)
-      stream.writeInt32(buz)
+      stream.writeVec3Int32(self.bound_lower)
+      stream.writeVec3Int32(self.bound_upper)
 
       stream.writeInt32(self.num_blocks())
       for block in self.blocks:
-        stream.writeInt32(block.posx)
-        stream.writeInt32(block.posy)
-        stream.writeInt32(block.posz)
+        stream.writeVec3Int32(block.get_position())
 
         # Need to take the orientation as 4 bits and the active state
         # as 4 bits, concatenate them, and then write that as a UChar
@@ -240,15 +230,12 @@ class Template:
         master = group[0]
         slaves = group[1:]
         stream.writeInt16(0)
-        stream.writeInt16(master.posz)
-        stream.writeInt16(master.posy)
-        stream.writeInt16(master.posx)
+        # Need to save coordinates backwards
+        stream.writeVec3Int16(master.get_position()[::-1])
         stream.writeInt32(len(slaves))
         for slave in slaves:
           stream.writeInt16(0)
-          stream.writeInt16(slave.posz)
-          stream.writeInt16(slave.posy)
-          stream.writeInt16(slave.posx)
+          stream.writeVec3Int16(slave.get_position()[::-1])
       print 'Save Complete'
 
   def get_connection_groups(self):
@@ -277,17 +264,13 @@ class Template:
       stream = BinaryStream(ifile)
       # t.header = stream.readBytes(25)
       t.version = stream.readUChar()
-      t.bound_lower = (
-        stream.readInt32(),stream.readInt32(),stream.readInt32())
-      t.bound_upper = (
-        stream.readInt32(),stream.readInt32(),stream.readInt32())
+      t.bound_lower = stream.readVec3Int32()
+      t.bound_upper = stream.readVec3Int32()
       n_blocks = stream.readInt32()
       print 'Found %s %s' % (n_blocks, plural(n_blocks, 'block'))
       # Template Blocks
       for i in xrange(n_blocks):
-        x = stream.readInt32()
-        y = stream.readInt32()
-        z = stream.readInt32()
+        x,y,z = stream.readVec3Int32()
         # Block ID Bytes
         # ex:
         # 0x09 0x92 0x56
@@ -297,18 +280,12 @@ class Template:
         # Third Byte is the id remainder
         state_byte = stream.readChar()
         state_bits = bits(state_byte, 8)
-
         orientation = int(state_bits[0:4], 2)
-        # print 'Orientation: %s' % orientation
         active = state_bits[4:]
         active = int(active, 2)
-        # print 'Active: %s' % active
         active = False if active in [8,1] else True
-        # print 'Active: %s' % active
-
         offset = stream.readUChar()
         block_id_remainder = stream.readUChar()
-
         # Apparently after more trial and error, only the last 2 bits
         # are important. This needs a bit more testing though just to
         # make sure.
@@ -316,7 +293,6 @@ class Template:
         offset = bits(offset, 2)
         offset = int(offset, 2)
         offset = offset * 256
-
         block_id = block_id_remainder + offset
         block = Block(block_id, posx=x, posy=y, posz=z,
           orientation=orientation, active=active)
@@ -327,34 +303,20 @@ class Template:
       # Template Connections
       for j in xrange(n_connection_groups):
         unknown_filler = stream.readInt16()
-        master_z = stream.readInt16()
-        master_y = stream.readInt16()
-        master_x = stream.readInt16()
-        master_pos = (master_x, master_y, master_z)
-
+        # Coordinates are saved as z,y,x so we need to reverse them
+        master_pos = stream.readVec3Int16()[::-1]
         n_connections = stream.readInt32()
         print n_connections
-
         for x in xrange(n_connections):
           unknown_filler3 = stream.readInt16()
-          # print unknown_filler3
-
-          slave_z = stream.readInt16()
-          slave_y = stream.readInt16()
-          slave_x = stream.readInt16()
-          slave_pos = (slave_x, slave_y, slave_z)
+          # Saved backwards again
+          slave_pos = stream.readVec3Int16()[::-1]
           t.connect_blocks_at(slave_pos, master_pos)
-
-
     return t
 
   @classmethod
   def fromJSON(cls, json_filepath):
     # Creates a template from a correctly formatted json file
-    return None
-
-  @classmethod
-  def fromBlocks(cls, blocks):
     return None
 
   def num_blocks(self):

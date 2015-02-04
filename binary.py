@@ -51,6 +51,21 @@ class BinaryStream:
         length = self.readUInt16()
         return self.unpack(str(length) + 's', length)
 
+    def readVec3F(self):
+        return (self.readFloat(),self.readFloat(),self.readFloat())
+
+    def readVec3UInt16(self):
+        return (self.readUInt16(),self.readUInt16(),self.readUInt16())
+
+    def readVec3Int16(self):
+        return (self.readInt16(),self.readInt16(),self.readInt16())
+
+    def readVec3UInt32(self):
+        return (self.readUInt32(),self.readUInt32(),self.readUInt32())
+
+    def readVec3Int32(self):
+        return (self.readInt32(),self.readInt32(),self.readInt32())
+
     def writeBytes(self, value):
         self.base_stream.write(value)
 
@@ -91,6 +106,31 @@ class BinaryStream:
         length = len(value)
         self.writeUInt16(length)
         self.pack(str(length) + 's', value)
+
+    def writeVec3F(self, vec):
+        self.writeFloat(vec[0])
+        self.writeFloat(vec[1])
+        self.writeFloat(vec[2])
+
+    def writeVec3UInt16(self, vec):
+        self.writeUInt16(vec[0])
+        self.writeUInt16(vec[1])
+        self.writeUInt16(vec[2])
+
+    def writeVec3Int16(self, vec):
+        self.writeInt16(vec[0])
+        self.writeInt16(vec[1])
+        self.writeInt16(vec[2])
+
+    def writeVec3UInt32(self, vec):
+        self.writeUInt32(vec[0])
+        self.writeUInt32(vec[1])
+        self.writeUInt32(vec[2])
+
+    def writeVec3Int32(self, vec):
+        self.writeInt32(vec[0])
+        self.writeInt32(vec[1])
+        self.writeInt32(vec[2])
 
     def pack(self, fmt, data):
         return self.writeBytes(pack(fmt, data))

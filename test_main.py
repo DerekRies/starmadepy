@@ -197,6 +197,7 @@ class TestTemplateLoading:
     # Make sure connections between blocks are saved
     assert t1.num_connections() == t2.num_connections()
 
+  @pytest.mark.filewrite
   def test_save_new_data(self):
     saved_name = 'data/test-templates/generate.smtpl'
     t1 = Template()
