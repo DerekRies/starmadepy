@@ -1,4 +1,5 @@
 argh==0.26.1
+autopep8==1.1
 backports.ssl-match-hostname==3.4.0.2
 certifi==14.5.14
 docutils==0.12
@@ -9,6 +10,7 @@ Markdown==2.4.1
 MarkupSafe==0.23
 mkdocs==0.11.1
 pathtools==0.1.2
+pep8==1.6.1
 Pillow==2.7.0
 py==1.4.26
 Pygments==2.0.2
