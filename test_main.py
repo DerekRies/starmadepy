@@ -1,5 +1,6 @@
 import pytest
 import os
+import pep8
 from starmade import Block, Template, shape, tier
 
 
@@ -211,3 +212,11 @@ class TestTemplateLoading:
     os.remove(saved_name)
     assert t1.num_blocks() == t2.num_blocks()
     assert t1.num_connections() == t2.num_connections()
+
+
+@pytest.mark.style
+class TestStyle:
+    def test_pep8(self):
+        pep8style = pep8.StyleGuide()
+        result = pep8style.check_files(['starmade.py', 'binary.py', 'utils.py'])
+        assert result.total_errors == 0
