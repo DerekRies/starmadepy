@@ -1,10 +1,15 @@
-# http://stackoverflow.com/questions/442188/readint-readbyte-readstring-etc-in-python/4338551#4338551
+"""
+Modified version of the sample code provided by Zippoxer on stackoverflow
+stackoverflow.com/questions/442188/readint-readbyte-readstring-etc-in-python/
 
-# Note: Java DataInputStream/DataOutputStream is big-endian
+Using Big-Endian because that's what the Java library uses.
+"""
 
 from struct import *
 
+
 class BinaryStream:
+
     def __init__(self, base_stream):
         self.base_stream = base_stream
 
@@ -52,19 +57,19 @@ class BinaryStream:
         return self.unpack(str(length) + 's', length)
 
     def readVec3F(self):
-        return (self.readFloat(),self.readFloat(),self.readFloat())
+        return (self.readFloat(), self.readFloat(), self.readFloat())
 
     def readVec3UInt16(self):
-        return (self.readUInt16(),self.readUInt16(),self.readUInt16())
+        return (self.readUInt16(), self.readUInt16(), self.readUInt16())
 
     def readVec3Int16(self):
-        return (self.readInt16(),self.readInt16(),self.readInt16())
+        return (self.readInt16(), self.readInt16(), self.readInt16())
 
     def readVec3UInt32(self):
-        return (self.readUInt32(),self.readUInt32(),self.readUInt32())
+        return (self.readUInt32(), self.readUInt32(), self.readUInt32())
 
     def readVec3Int32(self):
-        return (self.readInt32(),self.readInt32(),self.readInt32())
+        return (self.readInt32(), self.readInt32(), self.readInt32())
 
     def writeBytes(self, value):
         self.base_stream.write(value)
@@ -135,5 +140,5 @@ class BinaryStream:
     def pack(self, fmt, data):
         return self.writeBytes(pack(fmt, data))
 
-    def unpack(self, fmt, length = 1):
+    def unpack(self, fmt, length=1):
         return unpack(fmt, self.readBytes(length))[0]
