@@ -187,14 +187,14 @@ class Block:
         print "Door: %s" % self.door
 
 
-class Template:
+class BlockGroup:
 
-    """Template deserialized from a .smtpl file or generated through code
-    composed of blocks and connections
+    """Used to share functionality and a common interface between Templates
+    and Blueprints
     """
 
     def __init__(self):
-        # Creates an empty template from a supplied data source
+        # Creates an empty block group
         self.name = None
         self.header = None
         self.blocks = []
@@ -208,61 +208,6 @@ class Template:
     def empty(self):
         self.blocks = []
         self.connections = []
-
-    def save(self, filepath):
-        with open(filepath, 'wb') as ofile:
-            stream = BinaryStream(ofile)
-            stream.writeUChar(self.version)
-
-            if self.bound_lower is None or self.bound_upper is None:
-                # create the bounds
-                self.bound_lower = (0, 0, 0)
-                self.bound_upper = self.box_dimensions()
-            stream.writeVec3Int32(self.bound_lower)
-            stream.writeVec3Int32(self.bound_upper)
-
-            stream.writeInt32(self.num_blocks())
-            for block in self.blocks:
-                stream.writeVec3Int32(block.get_position())
-
-                # Need to take the orientation as 4 bits and the active state
-                # as 4 bits, concatenate them, and then write that as a UChar
-                active_bits = '1000'
-                if block.active and not block.door:
-                    # Block On
-                    active_bits = '0000'
-                elif block.active and block.door:
-                    # Door Open
-                    active_bits = '1001'
-                elif not block.active and block.door:
-                    # Door Closed
-                    active_bits = '0001'
-                orientation_bits = format(block.orientation, '#06b')[2:]
-                state = int(orientation_bits + active_bits, 2)
-                stream.writeUChar(state)
-                # stream.writeUChar(block.orientation)
-
-                id_remainder = block.id % 256
-                offset = block.id / 256
-                offset_bits = '0010' + '{0:04b}'.format(offset)
-                stream.writeUChar(int(offset_bits, 2))
-                stream.writeUChar(id_remainder)
-            # stream.writeInt32(0)
-            # Writing the Connections portion of the file
-            # Connections not supported yet so just writing 4 blank bytes
-            connection_groups = self.get_connection_groups()
-            stream.writeInt32(len(connection_groups))
-            for group in connection_groups:
-                master = group[0]
-                slaves = group[1:]
-                stream.writeInt16(0)
-                # Need to save coordinates backwards
-                stream.writeVec3Int16(master.get_position()[::-1])
-                stream.writeInt32(len(slaves))
-                for slave in slaves:
-                    stream.writeInt16(0)
-                    stream.writeVec3Int16(slave.get_position()[::-1])
-            print 'Save Complete'
 
     def get_connection_groups(self):
         connection_groups = []
@@ -280,71 +225,6 @@ class Template:
             else:
                 connection_groups[cur_pos].append(slave)
         return connection_groups
-
-    @classmethod
-    def fromSMTPL(cls, smtpl_filepath):
-        # Creates a template from a .smtpl file
-        t = cls()
-        t.name = smtpl_filepath
-        print 'Deserializing %s' % smtpl_filepath
-        with open(smtpl_filepath, 'rb') as ifile:
-            stream = BinaryStream(ifile)
-            # t.header = stream.readBytes(25)
-            t.version = stream.readUChar()
-            t.bound_lower = stream.readVec3Int32()
-            t.bound_upper = stream.readVec3Int32()
-            n_blocks = stream.readInt32()
-            print 'Found %s %s' % (n_blocks, plural(n_blocks, 'block'))
-            # Template Blocks
-            for i in xrange(n_blocks):
-                x, y, z = stream.readVec3Int32()
-                # Block ID Bytes
-                # ex:
-                # 0x09 0x92 0x56
-                # First Byte is the Orientation
-                # Second Byte is the offset, only the last 4 bits (OLD, now
-                # know this is the last 2 bits) matters
-                # Third Byte is the id remainder
-                state_byte = stream.readChar()
-                state_bits = bits(state_byte, 8)
-                orientation = int(state_bits[0:4], 2)
-                active = state_bits[4:]
-                active = int(active, 2)
-                active = False if active in [8, 1] else True
-                offset = stream.readUChar()
-                block_id_remainder = stream.readUChar()
-                # Apparently after more trial and error, only the last 2 bits
-                # are important. This needs a bit more testing though just to
-                # make sure.
-                # offset = bits(offset, 4)
-                offset = bits(offset, 2)
-                offset = int(offset, 2)
-                offset = offset * 256
-                block_id = block_id_remainder + offset
-                block = Block(block_id, posx=x, posy=y, posz=z,
-                              orientation=orientation, active=active)
-                t.add(block)
-            n_connection_groups = stream.readInt32()
-            print "File says: %s connection groups" % n_connection_groups
-
-            # Template Connections
-            for j in xrange(n_connection_groups):
-                unknown_filler = stream.readInt16()
-                # Coordinates are saved as z,y,x so we need to reverse them
-                master_pos = stream.readVec3Int16()[::-1]
-                n_connections = stream.readInt32()
-                print n_connections
-                for x in xrange(n_connections):
-                    unknown_filler3 = stream.readInt16()
-                    # Saved backwards again
-                    slave_pos = stream.readVec3Int16()[::-1]
-                    t.connect_blocks_at(slave_pos, master_pos)
-        return t
-
-    @classmethod
-    def fromJSON(cls, json_filepath):
-        # Creates a template from a correctly formatted json file
-        return None
 
     def num_blocks(self):
         return len(self.blocks)
@@ -462,49 +342,132 @@ class Template:
             print '{0}: {1}'.format(block.name, block.active)
 
 
-def test():
-    # b = Block.from_itemname('Plex Door')
-    # b.move_to(2,2,2)
-    # b.info()
+class Template(BlockGroup):
 
-    # t1 = Template.fromSMTPL('data/test-templates/Pulse.smtpl')
-    t_dir = 'data/test-templates/'
-    t1 = Template.fromSMTPL(
-        'data/test-templates/connections/pulse test 1.smtpl')
-    # t1 = Template.fromSMTPL(t_dir + 'connections/pulse test 2.smtpl')
-    # t1 = Template.fromSMTPL(t_dir + 'connections/pulse test 3.smtpl')
-    # t1 = Template.fromSMTPL(t_dir + 'connections/pulse test 4.smtpl')
-    # t1 = Template.fromSMTPL(t_dir + 'connections/pulse test 5.smtpl')
-    # t1 = Template.fromSMTPL(t_dir + 'connections/hailmary1.smtpl')
-    # t1 = Template.fromSMTPL(t_dir + 'connections/hailmary2.smtpl')
-    # t1 = Template.fromSMTPL(t_dir + 'connections/hailmary3.smtpl')
-    # print t1.count_by_block()
-    t1._print_connections()
-    # print len(t1.get_connection_groups())
-    print t1.version
-    print t1.bound_lower
-    print t1.bound_upper
-    print t1.box_dimensions()
-    # t1._print_block_states()
-    # t1.mock_save()
-    # print t1.box_dimensions()
+    """Template deserialized from a .smtpl file or generated through code
+    composed of blocks and connections.
+    """
 
+    def save(self, filepath):
+        with open(filepath, 'wb') as ofile:
+            stream = BinaryStream(ofile)
+            stream.writeUChar(self.version)
 
-def write_test():
-    t1 = Template.fromSMTPL('data/test-templates/AAAstandardgrey.smtpl')
-    t = Template()
-    t.header = t1.header
-    for x in xrange(10):
-        t.add(Block(5, posx=x))
-        t.add(Block(431, posy=x))
-    t.add(Block(432, posx=3, posy=3, posz=3))
-    assert t.num_blocks() == 21
-    t.replace({'color': 'orange'}, {'color': 'blue'})
-    # t.replace({'shape': shape('wedge')}, {'color': 'red'})
-    print t.count_by_block()
-    t.save('data/test-templates/testoutput.smtpl')
+            if self.bound_lower is None or self.bound_upper is None:
+                # create the bounds
+                self.bound_lower = (0, 0, 0)
+                self.bound_upper = self.box_dimensions()
+            stream.writeVec3Int32(self.bound_lower)
+            stream.writeVec3Int32(self.bound_upper)
+
+            stream.writeInt32(self.num_blocks())
+            for block in self.blocks:
+                stream.writeVec3Int32(block.get_position())
+
+                # Need to take the orientation as 4 bits and the active state
+                # as 4 bits, concatenate them, and then write that as a UChar
+                active_bits = '1000'
+                if block.active and not block.door:
+                    # Block On
+                    active_bits = '0000'
+                elif block.active and block.door:
+                    # Door Open
+                    active_bits = '1001'
+                elif not block.active and block.door:
+                    # Door Closed
+                    active_bits = '0001'
+                orientation_bits = format(block.orientation, '#06b')[2:]
+                state = int(orientation_bits + active_bits, 2)
+                stream.writeUChar(state)
+                # stream.writeUChar(block.orientation)
+
+                id_remainder = block.id % 256
+                offset = block.id / 256
+                offset_bits = '0010' + '{0:04b}'.format(offset)
+                stream.writeUChar(int(offset_bits, 2))
+                stream.writeUChar(id_remainder)
+            # stream.writeInt32(0)
+            # Writing the Connections portion of the file
+            # Connections not supported yet so just writing 4 blank bytes
+            connection_groups = self.get_connection_groups()
+            stream.writeInt32(len(connection_groups))
+            for group in connection_groups:
+                master = group[0]
+                slaves = group[1:]
+                stream.writeInt16(0)
+                # Need to save coordinates backwards
+                stream.writeVec3Int16(master.get_position()[::-1])
+                stream.writeInt32(len(slaves))
+                for slave in slaves:
+                    stream.writeInt16(0)
+                    stream.writeVec3Int16(slave.get_position()[::-1])
+            print 'Save Complete'
+
+    @classmethod
+    def fromSMTPL(cls, smtpl_filepath):
+        # Creates a template from a .smtpl file
+        t = cls()
+        t.name = smtpl_filepath
+        print 'Deserializing %s' % smtpl_filepath
+        with open(smtpl_filepath, 'rb') as ifile:
+            stream = BinaryStream(ifile)
+            # t.header = stream.readBytes(25)
+            t.version = stream.readUChar()
+            t.bound_lower = stream.readVec3Int32()
+            t.bound_upper = stream.readVec3Int32()
+            n_blocks = stream.readInt32()
+            print 'Found %s %s' % (n_blocks, plural(n_blocks, 'block'))
+            # Template Blocks
+            for i in xrange(n_blocks):
+                x, y, z = stream.readVec3Int32()
+                # Block ID Bytes
+                # ex:
+                # 0x09 0x92 0x56
+                # First Byte is the Orientation
+                # Second Byte is the offset, only the last 4 bits (OLD, now
+                # know this is the last 2 bits) matters
+                # Third Byte is the id remainder
+                state_byte = stream.readChar()
+                state_bits = bits(state_byte, 8)
+                orientation = int(state_bits[0:4], 2)
+                active = state_bits[4:]
+                active = int(active, 2)
+                active = False if active in [8, 1] else True
+                offset = stream.readUChar()
+                block_id_remainder = stream.readUChar()
+                # Apparently after more trial and error, only the last 2 bits
+                # are important. This needs a bit more testing though just to
+                # make sure.
+                # offset = bits(offset, 4)
+                offset = bits(offset, 2)
+                offset = int(offset, 2)
+                offset = offset * 256
+                block_id = block_id_remainder + offset
+                block = Block(block_id, posx=x, posy=y, posz=z,
+                              orientation=orientation, active=active)
+                t.add(block)
+            n_connection_groups = stream.readInt32()
+            print "File says: %s connection groups" % n_connection_groups
+
+            # Template Connections
+            for j in xrange(n_connection_groups):
+                unknown_filler = stream.readInt16()
+                # Coordinates are saved as z,y,x so we need to reverse them
+                master_pos = stream.readVec3Int16()[::-1]
+                n_connections = stream.readInt32()
+                print n_connections
+                for x in xrange(n_connections):
+                    unknown_filler3 = stream.readInt16()
+                    # Saved backwards again
+                    slave_pos = stream.readVec3Int16()[::-1]
+                    t.connect_blocks_at(slave_pos, master_pos)
+        return t
+
+    @classmethod
+    def fromJSON(cls, json_filepath):
+        # Creates a template from a correctly formatted json file
+        return None
 
 
 if __name__ == '__main__':
-    test()
-    # write_test()
+    pass
