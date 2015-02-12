@@ -14,7 +14,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1.2',
+    version='0.1.4',
 
     description='An API for reading and manipulating Starmade game data',
     long_description=long_description,
@@ -65,8 +65,9 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
+    include_package_data=True,
     package_data={
-        'data': ['data/items-complete.json'],
+        'starmadepy': ['data/items-complete.json'],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
