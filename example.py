@@ -1,4 +1,4 @@
-import starmade
+from starmadepy import starmade
 
 """
 Sample file showing some basic usage of the starmadepy API
@@ -7,7 +7,7 @@ Sample file showing some basic usage of the starmadepy API
 
 def main():
     t1 = starmade.Template.fromSMTPL(
-        'data/test-templates/connections/pulse test 1.smtpl')
+        'starmade/data/test-templates/connections/pulse test 1.smtpl')
     t1._print_connections()
     # print len(t1.get_connection_groups())
     print t1.version

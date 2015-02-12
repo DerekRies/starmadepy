@@ -1,6 +1,6 @@
 *.pyc
 __pycache__
-data/templates
+starmadepy/data/templates
 quickedit.py
 pic2tpl.py
 site

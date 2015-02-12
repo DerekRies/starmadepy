@@ -12,7 +12,7 @@ Starmade.py is a collection of various helpers for manipulating Starmade data
 
 # items-complete.json has the expanded meta data needed for items
 # including things like: shape, armor tier, and color
-item_data_path = 'data/items-complete.json'
+item_data_path = 'starmadepy/data/items-complete.json'
 fh = open(item_data_path, 'r')
 item_data = json.load(fh)
 items = item_data['items']
