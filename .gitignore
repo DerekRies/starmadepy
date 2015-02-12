@@ -4,3 +4,6 @@ starmadepy/data/templates
 quickedit.py
 pic2tpl.py
 site
+build
+dist
+*.egg-info/
