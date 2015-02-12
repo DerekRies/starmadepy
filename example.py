@@ -1,3 +1,4 @@
+import starmadepy
 from starmadepy import starmade
 
 """
@@ -6,6 +7,8 @@ Sample file showing some basic usage of the starmadepy API
 
 
 def main():
+    pkg_loc = starmadepy.__file__
+    print pkg_loc
     t1 = starmade.Template.fromSMTPL(
         'starmadepy/data/test-templates/connections/pulse test 1.smtpl')
     t1._print_connections()
