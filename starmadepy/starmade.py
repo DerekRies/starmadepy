@@ -1,6 +1,8 @@
 import json
 import binascii
 import copy
+import pkgutil
+
 
 from bisect import bisect_left
 from utils import tuple_add, tuple_sub, plural, bits
@@ -12,11 +14,13 @@ Starmade.py is a collection of various helpers for manipulating Starmade data
 
 # items-complete.json has the expanded meta data needed for items
 # including things like: shape, armor tier, and color
-item_data_path = 'data/items-complete.json'
-fh = open(item_data_path, 'r')
-item_data = json.load(fh)
+# item_data_path = 'starmadepy/data/items-complete.json'
+# fh = open(item_data_path, 'r')
+fh = pkgutil.get_data('starmadepy', 'data/items-complete.json')
+print type(fh)
+item_data = json.loads(fh)
 items = item_data['items']
-fh.close()
+# fh.close()
 id_map = {}
 name_map = {}
 SHAPES = item_data['shapes']
@@ -470,4 +474,5 @@ class Template(BlockGroup):
 
 
 if __name__ == '__main__':
+    # fdata = pkgutil.get_data('', 'data/items-complete.json')
     pass

@@ -1,7 +1,7 @@
 import pytest
 import os
 import pep8
-from starmade import Block, Template, shape, tier
+from starmadepy.starmade import Block, Template, shape, tier
 
 
 
@@ -12,6 +12,9 @@ This will exclude tests that make sure writing of files is working, which will a
 cause the tests to be rerun infinitely when using something like 'rerun' to
 automatically rerun those tests.
 """
+
+tpl_dir = 'starmadepy/data/test-templates/'
+# tpl_dir = 'data/test-templates/'
 
 
 class TestBlock:
@@ -152,7 +155,7 @@ class TestTemplateConnections:
   def test_read_connections(self):
     # TODO: Need to create some template test-cases
     # of varying size and complexity
-    # t1 = Template.fromSMTPL('data/test-templates/XOR Gate.smtpl')
+    # t1 = Template.fromSMTPL(tpl_dir + 'XOR Gate.smtpl')
     # assert t1.num_connections() == 6
     pass
 
@@ -166,27 +169,27 @@ class TestTemplateConnections:
 
 class TestTemplateLoading:
   def test_small_armors(self):
-    t1 = Template.fromSMTPL('data/test-templates/AAAstandardgrey.smtpl')
+    t1 = Template.fromSMTPL(tpl_dir + 'AAAstandardgrey.smtpl')
     assert len(t1.blocks) == 1
     assert t1.blocks[0].id == 5
-    t2 = Template.fromSMTPL('data/test-templates/AAAbasicgrey.smtpl')
+    t2 = Template.fromSMTPL(tpl_dir + 'AAAbasicgrey.smtpl')
     assert t2.blocks[0].id == 598
-    t3 = Template.fromSMTPL('data/test-templates/AAApossiblesalvage.smtpl')
+    t3 = Template.fromSMTPL(tpl_dir + 'AAApossiblesalvage.smtpl')
     assert t3.blocks[0].id == 4
 
   def test_logic_blocks(self):
-    t1 = Template.fromSMTPL('data/test-templates/XOR Gate.smtpl')
+    t1 = Template.fromSMTPL(tpl_dir + 'XOR Gate.smtpl')
     assert t1.num_blocks() == 8
 
   def test_active_states(self):
-    t1 = Template.fromSMTPL('data/test-templates/Pulse.smtpl')
+    t1 = Template.fromSMTPL(tpl_dir + 'Pulse.smtpl')
     assert t1.get_all_blocks(name="NOT-Signal")[0].active == True
     assert len(t1.get_all_blocks(active=False)) == 3
 
   @pytest.mark.filewrite
   def test_save_data(self):
-    saved_name = 'data/test-templates/connections/pulse test 5 (saved).smtpl'
-    t1 = Template.fromSMTPL('data/test-templates/connections/pulse test 5.smtpl')
+    saved_name = tpl_dir + 'connections/pulse test 5 (saved).smtpl'
+    t1 = Template.fromSMTPL(tpl_dir + 'connections/pulse test 5.smtpl')
     t1.save(saved_name)
     t2 = Template.fromSMTPL(saved_name)
     t1not = t1.get_all_blocks(name="NOT-Signal")[0]
@@ -200,7 +203,7 @@ class TestTemplateLoading:
 
   @pytest.mark.filewrite
   def test_save_new_data(self):
-    saved_name = 'data/test-templates/generate.smtpl'
+    saved_name = tpl_dir + 'generate.smtpl'
     t1 = Template()
     b1 = Block.from_itemname('Activation Module')
     b2 = Block(409, posy=1)
@@ -218,5 +221,8 @@ class TestTemplateLoading:
 class TestStyle:
     def test_pep8(self):
         pep8style = pep8.StyleGuide()
-        result = pep8style.check_files(['starmade.py', 'binary.py', 'utils.py'])
+        result = pep8style.check_files([
+            'starmadepy/starmade.py',
+            'starmadepy/binary.py',
+            'starmadepy/utils.py'])
         assert result.total_errors == 0
