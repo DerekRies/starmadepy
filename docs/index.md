@@ -1,12 +1,12 @@
 Starmadepy v0.1
 ===================
 
-A Python library for manipulating Starmade game data
+A Python library for manipulating Starmade game data.
 
 Overview
 -------------------
 
-Starmadepy is a simple python library that makes parsing and manipulating Starmade game data easy. As this project is fairly new, the only file type that is currently supported is the `.smtpl`, or **Template** file type.
+Starmadepy is a simple python library that makes parsing and manipulating Starmade game data easy. As this project is fairly new, the only file type that is currently supported is the `.smtpl`, or **Starmade Template** file type.
 
 
     from starmadepy import starmade
@@ -16,7 +16,9 @@ Starmadepy is a simple python library that makes parsing and manipulating Starma
 
     template = starmade.Template.fromSMTPL('sometemplatefile.smtpl')
     template.replace({'color': 'grey'}, {'color': 'orange'})
+    template.save('outtemplatefile.smtpl')
 
+![Converted Template](img/tutorial1.png)
 
 Installation
 -------------------
