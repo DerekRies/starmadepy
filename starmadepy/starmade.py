@@ -5,8 +5,8 @@ import pkgutil
 
 
 from bisect import bisect_left
-from utils import tuple_add, tuple_sub, plural, bits
-from binary import BinaryStream
+from utils import tuple_add, tuple_sub, plural, bits, split_every_nchars
+from binary import BinaryStream, BitPacker
 
 """
 Starmade.py is a collection of various helpers for manipulating Starmade data
@@ -40,7 +40,9 @@ def tier(t):
 
 class Block:
 
-    """Block class, i don't know what to do just yet.
+    """Block class serves two roles
+        1. to provide an interface for the starmade block database
+        2. to represent an actual block in a BlockGroup (template or bp)
     """
 
     def __init__(
@@ -72,9 +74,6 @@ class Block:
     def props(self):
         return ['color', 'tier', 'shape']
 
-    def has_active_state(self):
-        return False
-
     @classmethod
     def from_stream(cls, stream):
         """
@@ -89,11 +88,10 @@ class Block:
         - remainder of bits are block hitpoints value
         """
         total_bits = stream.readNBytesAsBits(3)
-        # print total_bits
-        # Block is the last 10 bits
         block_id = int(total_bits[-11:], 2)
-        print "First 8 bits: %s" % total_bits[:8]
         block = cls(block_id)
+        block.hitpoints = int(total_bits[5:-11], 2)
+        print block.hitpoints
         if block.shape == shape('corner'):
             # corners require more bits to represent adequately
             block.orientation = int(total_bits[:5], 2)
@@ -101,17 +99,30 @@ class Block:
             orient_bits = total_bits[:4]
             active_bit = total_bits[4]
             print orient_bits
+            print 'active bit: %s' % active_bit
             block.active = not bool(int(active_bit))
-            block.hitpoints = int(total_bits[5:-11], 2)
             block.orientation = int(orient_bits, 2)
             # I'm representing doors the other way around as it makes sense
-            # to me. OPEN = ON, CLOSED = OFF
+            # to me.
+            # OPEN = ON = 0, CLOSED = OFF = 1
             if block.door:
                 block.active = not block.active
-        # print 'Block Active: %s' % block.active
-        # print 'Block Hitpoints: %s' % block.hitpoints
-        # print 'Block Orientation: %s' % block.orientation
+        print total_bits
         return block
+
+    def serialize_to_stream(self, stream):
+        bitpacker = BitPacker()
+        if self.shape == shape('corner'):
+            bitpacker.pack(self.orientation, 5)
+        else:
+            bitpacker.pack(self.orientation, 4)
+            if self.door:
+                bitpacker.pack(self.active, 1)
+            else:
+                bitpacker.pack(not self.active, 1)
+        bitpacker.pack(self.hitpoints, 8)
+        bitpacker.pack(self.id, 11)
+        bitpacker.write(stream)
 
     @classmethod
     def from_itemname(cls, name):
@@ -220,7 +231,7 @@ class Block:
         # Should be used to move a block in relation to its current position
         self.move_to(*args)
 
-    def set_position(self, x, y, z):
+    def set_position(self, x=0, y=0, z=0):
         self.posx = x
         self.posy = y
         self.posz = z
@@ -419,29 +430,7 @@ class Template(BlockGroup):
             stream.writeInt32(self.num_blocks())
             for block in self.blocks:
                 stream.writeVec3Int32(block.get_position())
-
-                # Need to take the orientation as 4 bits and the active state
-                # as 4 bits, concatenate them, and then write that as a UChar
-                active_bits = '1000'
-                if block.active and not block.door:
-                    # Block On
-                    active_bits = '0000'
-                elif block.active and block.door:
-                    # Door Open
-                    active_bits = '1001'
-                elif not block.active and block.door:
-                    # Door Closed
-                    active_bits = '0001'
-                orientation_bits = format(block.orientation, '#06b')[2:]
-                state = int(orientation_bits + active_bits, 2)
-                stream.writeUChar(state)
-                # stream.writeUChar(block.orientation)
-
-                id_remainder = block.id % 256
-                offset = block.id / 256
-                offset_bits = '0010' + '{0:04b}'.format(offset)
-                stream.writeUChar(int(offset_bits, 2))
-                stream.writeUChar(id_remainder)
+                block.serialize_to_stream(stream)
             # stream.writeInt32(0)
             # Writing the Connections portion of the file
             # Connections not supported yet so just writing 4 blank bytes
@@ -476,38 +465,9 @@ class Template(BlockGroup):
             # Template Blocks
             for i in xrange(n_blocks):
                 x, y, z = stream.readVec3Int32()
-                # Block ID Bytes
-                # ex:
-                # 0x09 0x92 0x56
-                # First Byte is the Orientation
-                # Second Byte is the offset, only the last 4 bits (OLD, now
-                # know this is the last 2 bits) matters
-                # Third Byte is the id remainder
-                if debug:
-                    block = Block.from_stream(stream)
-                    block.set_position(x, y, z)
-                    t.add(block)
-                    print (x,y,z)
-                else:
-                    state_byte = stream.readChar()
-                    state_bits = bits(state_byte, 8)
-                    orientation = int(state_bits[0:4], 2)
-                    active = state_bits[4:]
-                    active = int(active, 2)
-                    active = False if active in [8, 1] else True
-                    offset = stream.readUChar()
-                    block_id_remainder = stream.readUChar()
-                    # Apparently after more trial and error, only the last 2 bits
-                    # are important. This needs a bit more testing though just to
-                    # make sure.
-                    # offset = bits(offset, 4)
-                    offset = bits(offset, 2)
-                    offset = int(offset, 2)
-                    offset = offset * 256
-                    block_id = block_id_remainder + offset
-                    block = Block(block_id, posx=x, posy=y, posz=z,
-                                  orientation=orientation, active=active)
-                    t.add(block)
+                block = Block.from_stream(stream)
+                block.move_to(x, y, z)
+                t.add(block)
             n_connection_groups = stream.readInt32()
             print "File says: %s connection groups" % n_connection_groups
 

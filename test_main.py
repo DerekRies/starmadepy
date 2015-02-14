@@ -209,6 +209,7 @@ class TestTemplateLoading:
     t1.save(saved_name)
     t2 = Template.fromSMTPL(saved_name)
     os.remove(saved_name)
+    # TODO:
     # Check to make sure all the wedges have the same orientation
     # as the original file
     pass

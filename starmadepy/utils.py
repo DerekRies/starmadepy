@@ -21,6 +21,10 @@ def plural(n, s1):
         return s1
 
 
+def split_every_nchars(instr, n):
+    return [instr[i:i+n] for i in xrange(0, len(instr), n)]
+
+
 def bits(char, nbits):
     b = ''
     for i in reversed(xrange(nbits)):

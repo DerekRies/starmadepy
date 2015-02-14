@@ -152,3 +152,22 @@ class BinaryStream:
 
     def unpack(self, fmt, length=1):
         return unpack(fmt, self.readBytes(length))[0]
+
+
+class BitPacker:
+    """
+    Convenience for packing bits that can later be writen as bytes
+    """
+    def __init__(self):
+        self.bits = ''
+
+    def pack(self, value, bits):
+        self.bits += utils.bits(value, bits)
+
+    def get_bytes(n):
+        return [int(bs, 2) for bs in utils.split_every_nchars(self.bits, 8)]
+
+    def write(self, stream):
+        for bit_string in utils.split_every_nchars(self.bits, 8):
+            byte = int(bit_string, 2)
+            stream.writeUChar(byte)
