@@ -202,6 +202,18 @@ class TestTemplateLoading:
     assert t1.num_connections() == t2.num_connections()
 
   @pytest.mark.filewrite
+  def test_save_orientation_data(self):
+    fname = tpl_dir + 'tutorial1.smtpl'
+    saved_name = tpl_dir + 'tutorial1-save.smtpl'
+    t1 = Template.fromSMTPL(fname)
+    t1.save(saved_name)
+    t2 = Template.fromSMTPL(saved_name)
+    os.remove(saved_name)
+    # Check to make sure all the wedges have the same orientation
+    # as the original file
+    pass
+
+  @pytest.mark.filewrite
   def test_save_new_data(self):
     saved_name = tpl_dir + 'generate.smtpl'
     t1 = Template()

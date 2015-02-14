@@ -5,6 +5,8 @@ stackoverflow.com/questions/442188/readint-readbyte-readstring-etc-in-python/
 Using Big-Endian because that's what the Java library uses.
 """
 
+import utils
+
 from struct import *
 
 
@@ -55,6 +57,14 @@ class BinaryStream:
     def readString(self):
         length = self.readUInt16()
         return self.unpack(str(length) + 's', length)
+
+    def readNBytesAsBits(self, nbytes):
+        bits = ''
+        for i in xrange(nbytes):
+            byte = self.readChar()
+            byte_as_bits = utils.bits(byte, 8)
+            bits += byte_as_bits
+        return bits
 
     def readVec3F(self):
         return (self.readFloat(), self.readFloat(), self.readFloat())

@@ -17,7 +17,7 @@ Starmade.py is a collection of various helpers for manipulating Starmade data
 # item_data_path = 'starmadepy/data/items-complete.json'
 # fh = open(item_data_path, 'r')
 fh = pkgutil.get_data('starmadepy', 'data/items-complete.json')
-print type(fh)
+# print type(fh)
 item_data = json.loads(fh)
 items = item_data['items']
 # fh.close()
@@ -67,9 +67,51 @@ class Block:
         # OFF and Closed will be represented as a False state
         self.active = active
         self.door = data.get('door', False)
+        self.hitpoints = 1
 
     def props(self):
         return ['color', 'tier', 'shape']
+
+    def has_active_state(self):
+        return False
+
+    @classmethod
+    def from_stream(cls, stream):
+        """
+        Preferred method of parsing block data from a file, can be shared
+        between templates and blueprints.
+        Bit-packed in 3 bytes to represent block data
+
+        - start with last 11 bits for the block id
+        - if block has an active state, first 3 bits are orientation
+            and 4th bit is active state
+        - if block is a corner then first 5 bits are orientation, else 4
+        - remainder of bits are block hitpoints value
+        """
+        total_bits = stream.readNBytesAsBits(3)
+        # print total_bits
+        # Block is the last 10 bits
+        block_id = int(total_bits[-11:], 2)
+        print "First 8 bits: %s" % total_bits[:8]
+        block = cls(block_id)
+        if block.shape == shape('corner'):
+            # corners require more bits to represent adequately
+            block.orientation = int(total_bits[:5], 2)
+        else:
+            orient_bits = total_bits[:4]
+            active_bit = total_bits[4]
+            print orient_bits
+            block.active = not bool(int(active_bit))
+            block.hitpoints = int(total_bits[5:-11], 2)
+            block.orientation = int(orient_bits, 2)
+            # I'm representing doors the other way around as it makes sense
+            # to me. OPEN = ON, CLOSED = OFF
+            if block.door:
+                block.active = not block.active
+        # print 'Block Active: %s' % block.active
+        # print 'Block Hitpoints: %s' % block.hitpoints
+        # print 'Block Orientation: %s' % block.orientation
+        return block
 
     @classmethod
     def from_itemname(cls, name):
@@ -177,6 +219,11 @@ class Block:
         # Placeholder for the moment
         # Should be used to move a block in relation to its current position
         self.move_to(*args)
+
+    def set_position(self, x, y, z):
+        self.posx = x
+        self.posy = y
+        self.posz = z
 
     def get_position(self):
         return (self.posx, self.posy, self.posz)
@@ -345,6 +392,11 @@ class BlockGroup:
         for block in self.blocks:
             print '{0}: {1}'.format(block.name, block.active)
 
+    def _print_block_orientations(self):
+        for block in self.blocks:
+            print '{0} ({1}): {2}'.format(
+                block.name, str(block.get_position()), block.orientation)
+
 
 class Template(BlockGroup):
 
@@ -408,7 +460,7 @@ class Template(BlockGroup):
             print 'Save Complete'
 
     @classmethod
-    def fromSMTPL(cls, smtpl_filepath):
+    def fromSMTPL(cls, smtpl_filepath, debug=False):
         # Creates a template from a .smtpl file
         t = cls()
         t.name = smtpl_filepath
@@ -431,25 +483,31 @@ class Template(BlockGroup):
                 # Second Byte is the offset, only the last 4 bits (OLD, now
                 # know this is the last 2 bits) matters
                 # Third Byte is the id remainder
-                state_byte = stream.readChar()
-                state_bits = bits(state_byte, 8)
-                orientation = int(state_bits[0:4], 2)
-                active = state_bits[4:]
-                active = int(active, 2)
-                active = False if active in [8, 1] else True
-                offset = stream.readUChar()
-                block_id_remainder = stream.readUChar()
-                # Apparently after more trial and error, only the last 2 bits
-                # are important. This needs a bit more testing though just to
-                # make sure.
-                # offset = bits(offset, 4)
-                offset = bits(offset, 2)
-                offset = int(offset, 2)
-                offset = offset * 256
-                block_id = block_id_remainder + offset
-                block = Block(block_id, posx=x, posy=y, posz=z,
-                              orientation=orientation, active=active)
-                t.add(block)
+                if debug:
+                    block = Block.from_stream(stream)
+                    block.set_position(x, y, z)
+                    t.add(block)
+                    print (x,y,z)
+                else:
+                    state_byte = stream.readChar()
+                    state_bits = bits(state_byte, 8)
+                    orientation = int(state_bits[0:4], 2)
+                    active = state_bits[4:]
+                    active = int(active, 2)
+                    active = False if active in [8, 1] else True
+                    offset = stream.readUChar()
+                    block_id_remainder = stream.readUChar()
+                    # Apparently after more trial and error, only the last 2 bits
+                    # are important. This needs a bit more testing though just to
+                    # make sure.
+                    # offset = bits(offset, 4)
+                    offset = bits(offset, 2)
+                    offset = int(offset, 2)
+                    offset = offset * 256
+                    block_id = block_id_remainder + offset
+                    block = Block(block_id, posx=x, posy=y, posz=z,
+                                  orientation=orientation, active=active)
+                    t.add(block)
             n_connection_groups = stream.readInt32()
             print "File says: %s connection groups" % n_connection_groups
 
