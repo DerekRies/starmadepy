@@ -15,14 +15,16 @@ Maybe you created a really nice component that utilizes blocks, wedges, corners,
 
 The following code will open a template file, select all the blocks with the color grey and then replace them with orange.
 
-    from starmadepy import starmade
+```python
+from starmadepy import starmade
 
-    # Loads a template file named sometemplatefile.smtpl
-    # Replaces all grey colored blocks, with orange equivalents
+# Loads a template file named sometemplatefile.smtpl
+# Replaces all grey colored blocks, with orange equivalents
 
-    template = starmade.Template.fromSMTPL('sometemplatefile.smtpl')
-    template.replace({'color': 'grey'}, {'color': 'orange'})
-    template.save('outtemplatefile.smtpl')
+template = starmade.Template.fromSMTPL('sometemplatefile.smtpl')
+template.replace({'color': 'grey'}, {'color': 'orange'})
+template.save('outtemplatefile.smtpl')
+```
 
 ![Converted Template](docs/img/tutorial1.png)
 
