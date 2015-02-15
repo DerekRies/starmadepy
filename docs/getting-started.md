@@ -30,4 +30,7 @@ If everything went correctly, you should now have a second template file with or
 
 ![template modification](img/tutorial1.png)
 
+- - -
+
+
 

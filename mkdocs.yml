@@ -5,7 +5,7 @@ theme: readthedocs
 pages:
  - [index.md, Home]
  - [getting-started.md, Getting Started]
- - [api.md, API]
  - [contributing.md, Contributing]
  - [projects.md, Projects Using Starmadepy]
  - [about.md, About]
+ - [api/starmade.md, 'API Modules']
