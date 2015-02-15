@@ -36,6 +36,8 @@ It is recommended that you use virtualenv or the virtualenvwrapper.
 
 
 ## Contributing
-coming soon
+
+Fork, clone, `pip install -r requirements.txt` and run the tests with `py.test`
+Full guide in the [docs](http://starmadepy.readthedocs.org/en/latest/contributing/)
 
 
