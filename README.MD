@@ -11,7 +11,7 @@ Starmadepy is a simple python library that makes parsing and manipulating Starma
 
 ## Example
 
-Maybe you created a really nice component that utilizes blocks, wedges, corners, heptas, and tetras in a couple different colors and you'd like to generate some copies of this template in different colors.
+Maybe you created a really nice component that utilizes blocks, wedges, corners, pentas, and tetras in a couple different colors and you'd like to generate some copies of this template in different colors.
 
 The following code will open a template file, select all the blocks with the color grey and then replace them with orange.
 
