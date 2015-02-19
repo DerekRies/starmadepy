@@ -17,7 +17,6 @@ Starmade.py is a collection of various helpers for manipulating Starmade data
 # item_data_path = 'starmadepy/data/items-complete.json'
 # fh = open(item_data_path, 'r')
 fh = pkgutil.get_data('starmadepy', 'data/items-complete.json')
-# print type(fh)
 item_data = json.loads(fh)
 items = item_data['items']
 # fh.close()
@@ -91,15 +90,12 @@ class Block:
         block_id = int(total_bits[-11:], 2)
         block = cls(block_id)
         block.hitpoints = int(total_bits[5:-11], 2)
-        print block.hitpoints
         if block.shape == shape('corner'):
             # corners require more bits to represent adequately
             block.orientation = int(total_bits[:5], 2)
         else:
             orient_bits = total_bits[:4]
             active_bit = total_bits[4]
-            print orient_bits
-            print 'active bit: %s' % active_bit
             block.active = not bool(int(active_bit))
             block.orientation = int(orient_bits, 2)
             # I'm representing doors the other way around as it makes sense
@@ -107,7 +103,6 @@ class Block:
             # OPEN = ON = 0, CLOSED = OFF = 1
             if block.door:
                 block.active = not block.active
-        print total_bits
         return block
 
     def serialize_to_stream(self, stream):
@@ -344,7 +339,6 @@ class BlockGroup:
         for specific block properties
         """
         queried_blocks = []
-        # print kwargs
         for block in self.blocks:
             filters = [bool(getattr(block, key) == val)
                        for key, val in kwargs.iteritems()]
@@ -446,14 +440,12 @@ class Template(BlockGroup):
                 for slave in slaves:
                     stream.writeInt16(0)
                     stream.writeVec3Int16(slave.get_position()[::-1])
-            print 'Save Complete'
 
     @classmethod
     def fromSMTPL(cls, smtpl_filepath, debug=False):
         # Creates a template from a .smtpl file
         t = cls()
         t.name = smtpl_filepath
-        print 'Deserializing %s' % smtpl_filepath
         with open(smtpl_filepath, 'rb') as ifile:
             stream = BinaryStream(ifile)
             # t.header = stream.readBytes(25)
@@ -461,7 +453,6 @@ class Template(BlockGroup):
             t.bound_lower = stream.readVec3Int32()
             t.bound_upper = stream.readVec3Int32()
             n_blocks = stream.readInt32()
-            print 'Found %s %s' % (n_blocks, plural(n_blocks, 'block'))
             # Template Blocks
             for i in xrange(n_blocks):
                 x, y, z = stream.readVec3Int32()
@@ -469,7 +460,6 @@ class Template(BlockGroup):
                 block.move_to(x, y, z)
                 t.add(block)
             n_connection_groups = stream.readInt32()
-            print "File says: %s connection groups" % n_connection_groups
 
             # Template Connections
             for j in xrange(n_connection_groups):
@@ -477,7 +467,6 @@ class Template(BlockGroup):
                 # Coordinates are saved as z,y,x so we need to reverse them
                 master_pos = stream.readVec3Int16()[::-1]
                 n_connections = stream.readInt32()
-                print n_connections
                 for x in xrange(n_connections):
                     unknown_filler3 = stream.readInt16()
                     # Saved backwards again
