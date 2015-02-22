@@ -2,6 +2,7 @@ import json
 import binascii
 import copy
 import pkgutil
+import os
 
 
 from bisect import bisect_left
@@ -481,6 +482,63 @@ class Template(BlockGroup):
     def fromJSON(cls, json_filepath):
         # Creates a template from a correctly formatted json file
         return None
+
+
+class Blueprint(BlockGroup):
+
+    """
+    Blueprint deserialized from a .sment file, blueprint folder, or generated
+    through code.
+    """
+
+    @classmethod
+    def read_header(cls, header_file_path, block_names=False):
+        """
+        Reads a header.smbph file and returns a dictionary of useful info about
+        the blueprint.
+        Entity Type: Indicates whether the blueprint is for a Ship, Shop, Space
+        Station, Asteroid or Planet.
+        Bouding Box: A pair of three-dimensional coordinates providing the min
+        and max block coords for the blueprint relative to the BP origin(0,0,0)
+        Element Map: An array of structures describing the number and types of
+        each block in the blueprint.
+        """
+        header_info = {}
+        print header_file_path
+        with open(header_file_path, 'rb') as ifile:
+            stream = BinaryStream(ifile)
+            header_info['version'] = stream.readInt32()
+            header_info['entityType'] = stream.readUInt32()
+            header_info['bounds'] = {
+                'min': stream.readVec3F(),
+                'max': stream.readVec3F()
+            }
+            num_elements = stream.readInt32()
+            elements = []
+            for i in xrange(num_elements):
+                element = {
+                    'block': stream.readInt16(),
+                    'count': stream.readInt32()
+                }
+                if block_names:
+                    element['block'] = Block.map_id_to_name(element['block'])
+                elements.append(element)
+            header_info['body'] = {
+                'numElements': num_elements,
+                'elements': elements
+            }
+        return header_info
+
+    @classmethod
+    def fromSMENT(cls, sment_filepath):
+        pass
+
+    @classmethod
+    def fromFolder(cls, folder_path):
+        header_file = folder_path + '/header.smbph'
+        info = cls.read_header(header_file, True)
+        print info
+        # print folder_path
 
 
 if __name__ == '__main__':

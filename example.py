@@ -22,5 +22,11 @@ def tutorial1():
     template.save('starmadepy/data/test-templates/tutorial(out).smtpl')
 
 
+def blueprint():
+    # blueprint = 'starmadepy/data/test-blueprints/Isanth-VI'
+    blueprint = 'starmadepy/data/test-blueprints/bptest4'
+    starmade.Blueprint.fromFolder(blueprint)
+
 if __name__ == '__main__':
-    tutorial1()
+    # tutorial1()
+    blueprint()
