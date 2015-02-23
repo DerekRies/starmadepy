@@ -530,7 +530,10 @@ class Blueprint(BlockGroup):
 
     @classmethod
     def read_meta(cls, meta_file_path):
-        return None
+        with open(meta_file_path, 'rb') as ifile:
+            stream = BinaryStream(ifile)
+            version = stream.readUInt32()
+        return version
 
     @classmethod
     def read_logic(cls, logic_file_path):
@@ -581,7 +584,7 @@ class Blueprint(BlockGroup):
         # print_logic(logic)
         # print meta
         # print folder_path
-        return (info, logic)
+        return (info, logic, meta)
 
 
 if __name__ == '__main__':
