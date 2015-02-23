@@ -6,6 +6,21 @@ from starmadepy import starmade
 Sample file showing some basic usage of the starmadepy API
 """
 
+def print_logic(l):
+    # print l
+    print '===================================='
+    print 'Found %s Controller Entities' % l.get('size')
+    print '===================================='
+    for entity in l['entities']:
+        print '  Entity at %s' % str(entity['pos'])
+        print '  Found %s groups' % entity.get('ngroups')
+        for group in entity.get('groups'):
+            bid = group.get('id')
+            print '    Group of: %s' % starmade.Block.map_id_to_name(bid)
+            print '    Found %s blocks in group' % group.get('nblocks')
+            for pos in group.get('positions'):
+                print '      %s' % str(pos)
+        print '-------------------'
 
 def main():
     # template = starmade.Template.fromSMTPL('starmadepy/data/test-templates/AAAstandardgrey.smtpl', debug=True)
@@ -25,7 +40,9 @@ def tutorial1():
 def blueprint():
     # blueprint = 'starmadepy/data/test-blueprints/Isanth-VI'
     blueprint = 'starmadepy/data/test-blueprints/bptest4'
-    starmade.Blueprint.fromFolder(blueprint)
+    bp = starmade.Blueprint.fromFolder(blueprint)
+    logic = bp[1]
+    print_logic(logic)
 
 if __name__ == '__main__':
     # tutorial1()

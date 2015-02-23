@@ -504,7 +504,6 @@ class Blueprint(BlockGroup):
         each block in the blueprint.
         """
         header_info = {}
-        print header_file_path
         with open(header_file_path, 'rb') as ifile:
             stream = BinaryStream(ifile)
             header_info['version'] = stream.readInt32()
@@ -530,6 +529,43 @@ class Blueprint(BlockGroup):
         return header_info
 
     @classmethod
+    def read_meta(cls, meta_file_path):
+        return None
+
+    @classmethod
+    def read_logic(cls, logic_file_path):
+        with open(logic_file_path, 'rb') as ifile:
+            stream = BinaryStream(ifile)
+            version = stream.readInt32()
+            num_controllers = stream.readInt32()
+            controller_entities = []
+            for i in xrange(num_controllers):
+                pos = stream.readVec3Int16()
+                ngroups = stream.readInt32()
+                groups = []
+                for j in xrange(ngroups):
+                    blockid = stream.readInt16()
+                    nblocks = stream.readInt32()
+                    block_pos_list = []
+                    for h in xrange(nblocks):
+                        block_pos_list.append(stream.readVec3Int16())
+                    groups.append({
+                        'id': blockid,
+                        'nblocks': nblocks,
+                        'positions': block_pos_list
+                        })
+                controller_entities.append({
+                    'pos': pos,
+                    'ngroups': ngroups,
+                    'groups': groups
+                    })
+        return {
+            'v': version,
+            'size': num_controllers,
+            'entities': controller_entities
+            }
+
+    @classmethod
     def fromSMENT(cls, sment_filepath):
         pass
 
@@ -537,8 +573,15 @@ class Blueprint(BlockGroup):
     def fromFolder(cls, folder_path):
         header_file = folder_path + '/header.smbph'
         info = cls.read_header(header_file, True)
+        meta_file = folder_path + '/meta.smbpm'
+        meta = cls.read_meta(meta_file)
+        logic_file = folder_path + '/logic.smbpl'
+        logic = cls.read_logic(logic_file)
         print info
+        # print_logic(logic)
+        # print meta
         # print folder_path
+        return (info, logic)
 
 
 if __name__ == '__main__':
