@@ -41,8 +41,8 @@ def blueprint():
     # blueprint = 'starmadepy/data/test-blueprints/Isanth-VI'
     blueprint = 'starmadepy/data/test-blueprints/bptest4'
     bp = starmade.Blueprint.fromFolder(blueprint)
-    # logic = bp[1]
-    # print_logic(logic)
+    logic = bp[1]
+    print_logic(logic)
 
 if __name__ == '__main__':
     # tutorial1()

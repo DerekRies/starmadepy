@@ -1,7 +1,7 @@
 import pytest
 import os
 import pep8
-from starmadepy.starmade import Block, Template, shape, tier
+from starmadepy.starmade import Block, Template, Blueprint, shape, tier
 
 
 
@@ -232,6 +232,21 @@ class TestTemplateLoading:
     os.remove(saved_name)
     assert t1.num_blocks() == t2.num_blocks()
     assert t1.num_connections() == t2.num_connections()
+
+
+class TestBlueprint:
+    def test_load_header(self):
+        bp_file = 'starmadepy/data/test-blueprints/bptest2'
+        bp = Blueprint.fromFolder(bp_file)
+        info, logic, meta = bp
+        assert info['body']['numElements'] == 3
+
+    def test_load_logic(self):
+        bp_file = 'starmadepy/data/test-blueprints/bptest4'
+        bp = Blueprint.fromFolder(bp_file)
+        logic = bp[1]
+        assert logic.get('size') == 2
+        
 
 
 @pytest.mark.style
