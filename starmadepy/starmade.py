@@ -491,6 +491,11 @@ class Blueprint(BlockGroup):
     through code.
     """
 
+    def __init__(self):
+        self.info = None
+        self.logic = None
+        self.meta = None
+
     @classmethod
     def read_header(cls, header_file_path, block_names=False):
         """
@@ -533,7 +538,39 @@ class Blueprint(BlockGroup):
         with open(meta_file_path, 'rb') as ifile:
             stream = BinaryStream(ifile)
             version = stream.readUInt32()
-        return version
+            docked_entries = []
+            tagtype = None
+            while tagtype != 1:
+                tagtype = stream.readUChar()
+                if tagtype == 1:
+                    print 'Finish'
+                    break
+                elif tagtype == 2:
+                    print 'SegManager'
+                    tag_v = stream.readUInt16()
+                    break
+                elif tagtype == 3:
+                    print 'Docking'
+                    dock_count = stream.readInt32()
+                    for i in xrange(dock_count):
+                        name = stream.readString()
+                        dock_pos = stream.readVec3Int32()
+                        dock_size = stream.readVec3F()
+                        dock_style = stream.readUInt16()
+                        dock_orientation = stream.readUChar()
+                        docked_entries.append({
+                            'name': name,
+                            'dockPos': dock_pos,
+                            'dockSize': dock_size,
+                            'dockStyle': dock_style,
+                            'dockOrientation': dock_orientation,
+                            })
+                    # break
+            
+        return {
+            'version': version,
+            'dockEntries': docked_entries,
+            }
 
     @classmethod
     def read_logic(cls, logic_file_path):
@@ -580,11 +617,15 @@ class Blueprint(BlockGroup):
         meta = cls.read_meta(meta_file)
         logic_file = folder_path + '/logic.smbpl'
         logic = cls.read_logic(logic_file)
-        print info
+        # print info
         # print_logic(logic)
         # print meta
         # print folder_path
-        return (info, logic, meta)
+        blueprint = cls()
+        blueprint.info = info
+        blueprint.logic = logic
+        blueprint.meta = meta
+        return blueprint
 
 
 if __name__ == '__main__':

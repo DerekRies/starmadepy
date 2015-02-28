@@ -39,10 +39,13 @@ def tutorial1():
 
 def blueprint():
     # blueprint = 'starmadepy/data/test-blueprints/Isanth-VI'
-    blueprint = 'starmadepy/data/test-blueprints/bptest4'
+    # blueprint = 'starmadepy/data/test-blueprints/bptest4'
+    blueprint = 'starmadepy/data/test-blueprints/TridentBattleCruiser1'
     bp = starmade.Blueprint.fromFolder(blueprint)
-    logic = bp[1]
-    print_logic(logic)
+    # print_logic(bp.logic)
+    print bp.meta
+    print '--------------------'
+    print bp.info
 
 if __name__ == '__main__':
     # tutorial1()
