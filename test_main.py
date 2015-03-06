@@ -238,13 +238,12 @@ class TestBlueprint:
     def test_load_header(self):
         bp_file = 'starmadepy/data/test-blueprints/bptest2'
         bp = Blueprint.fromFolder(bp_file)
-        info, logic, meta = bp
-        assert info['body']['numElements'] == 3
+        assert bp.info['body']['numElements'] == 3
 
     def test_load_logic(self):
         bp_file = 'starmadepy/data/test-blueprints/bptest4'
         bp = Blueprint.fromFolder(bp_file)
-        logic = bp[1]
+        logic = bp.logic
         assert logic.get('size') == 2
         
 

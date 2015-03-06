@@ -566,7 +566,6 @@ class Blueprint(BlockGroup):
                             'dockOrientation': dock_orientation,
                             })
                     # break
-            
         return {
             'version': version,
             'dockEntries': docked_entries,
