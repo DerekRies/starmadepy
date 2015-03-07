@@ -26,6 +26,10 @@ class TestBlock:
     block3 = Block(5, posy=3)
     assert block3.posy == 3
 
+  def test_failed_init(self):
+    with pytest.raises(Exception):
+        block1 = Block('Something')
+
   def test_init_active_state(self):
     # Blocks should always start out as off or closed (visible)
     b = Block.from_itemname('Activation Module')

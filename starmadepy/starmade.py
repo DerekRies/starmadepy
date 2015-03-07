@@ -53,6 +53,9 @@ class Block:
             orientation=0,
             active=False):
         # Creates a block from a supported item id
+        if type(item_id) is not int:
+            raise Exception("""Item ID is not an int. If you\'re using a block
+                name then use the Block.from_itemname method.""")
         data_index = id_map[item_id]
         data = items[data_index]
         self.name = data['name']
@@ -182,7 +185,7 @@ class Block:
         """
         Expects a string of equal to:
         'grey', 'white', 'black', 'purple', 'blue', 'red', 'green', 'orange',
-        or 'yellow'.
+        'yellow', 'yellow hazard', or 'green hazard'.
         """
         # find appropriate block of the new color provided
         if new_color != self.color:

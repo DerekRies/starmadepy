@@ -1,7 +1,7 @@
 {
     "shapes": {
         "wedge": 2,
-        "penta": 4,
+        "hepta": 4,
         "tetra": 5,
         "block": 1,
         "corner": 3
@@ -165,7 +165,7 @@
             "color": "black",
             "tier": 3,
             "shape": 4,
-            "name": "Black Advanced Armor Penta",
+            "name": "Black Advanced Armor Hepta",
             "id": 369
         },
         {
@@ -200,7 +200,7 @@
             "color": "black",
             "tier": 4,
             "shape": 4,
-            "name": "Black Crystal Armor Penta",
+            "name": "Black Crystal Armor Hepta",
             "id": 596
         },
         {
@@ -242,7 +242,7 @@
             "color": "black",
             "tier": 1,
             "shape": 4,
-            "name": "Black Hull Penta",
+            "name": "Black Hull Hepta",
             "id": 606
         },
         {
@@ -312,7 +312,7 @@
             "color": "black",
             "tier": 2,
             "shape": 4,
-            "name": "Black Standard Armor Penta",
+            "name": "Black Standard Armor Hepta",
             "id": 385
         },
         {
@@ -370,7 +370,7 @@
             "color": "blue",
             "tier": 3,
             "shape": 4,
-            "name": "Blue Advanced Armor Penta",
+            "name": "Blue Advanced Armor Hepta",
             "id": 372
         },
         {
@@ -405,7 +405,7 @@
             "color": "blue",
             "tier": 4,
             "shape": 4,
-            "name": "Blue Crystal Armor Penta",
+            "name": "Blue Crystal Armor Hepta",
             "id": 535
         },
         {
@@ -454,7 +454,7 @@
             "color": "blue",
             "tier": 1,
             "shape": 4,
-            "name": "Blue Hull Penta",
+            "name": "Blue Hull Hepta",
             "id": 621
         },
         {
@@ -524,7 +524,7 @@
             "color": "blue",
             "tier": 2,
             "shape": 4,
-            "name": "Blue Standard Armor Penta",
+            "name": "Blue Standard Armor Hepta",
             "id": 388
         },
         {
@@ -563,70 +563,70 @@
             "id": 341
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 3,
             "shape": 1,
             "name": "Brown Advanced Armor",
             "id": 269
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 3,
             "shape": 3,
             "name": "Brown Advanced Armor Corner",
             "id": 326
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 3,
             "shape": 4,
-            "name": "Brown Advanced Armor Penta",
+            "name": "Brown Advanced Armor Hepta",
             "id": 374
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 3,
             "shape": 5,
             "name": "Brown Advanced Armor Tetra",
             "id": 382
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 3,
             "shape": 2,
             "name": "Brown Advanced Armor Wedge",
             "id": 317
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 1,
             "shape": 1,
             "name": "Brown Hull",
             "id": 643
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 1,
             "shape": 3,
             "name": "Brown Hull Corner",
             "id": 645
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 1,
             "shape": 4,
-            "name": "Brown Hull Penta",
+            "name": "Brown Hull Hepta",
             "id": 646
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 1,
             "shape": 5,
             "name": "Brown Hull Tetra",
             "id": 647
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 1,
             "shape": 2,
             "name": "Brown Hull Wedge",
@@ -640,35 +640,35 @@
             "id": 241
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 2,
             "shape": 1,
             "name": "Brown Standard Armor",
             "id": 70
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 2,
             "shape": 3,
             "name": "Brown Standard Armor Corner",
             "id": 304
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 2,
             "shape": 4,
-            "name": "Brown Standard Armor Penta",
+            "name": "Brown Standard Armor Hepta",
             "id": 390
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 2,
             "shape": 5,
             "name": "Brown Standard Armor Tetra",
             "id": 404
         },
         {
-            "color": null,
+            "color": "brown",
             "tier": 2,
             "shape": 2,
             "name": "Brown Standard Armor Wedge",
@@ -682,56 +682,56 @@
             "id": 123
         },
         {
-            "color": "black",
+            "color": null,
             "tier": 0,
             "shape": 1,
             "name": "Burnt Black Dirt",
             "id": 210
         },
         {
-            "color": "blue",
+            "color": null,
             "tier": 0,
             "shape": 1,
             "name": "Burnt Blue Dirt",
             "id": 208
         },
         {
-            "color": "green",
+            "color": null,
             "tier": 0,
             "shape": 1,
             "name": "Burnt Green Dirt",
             "id": 207
         },
         {
-            "color": "orange",
+            "color": null,
             "tier": 0,
             "shape": 1,
             "name": "Burnt Orange Dirt",
             "id": 129
         },
         {
-            "color": "purple",
+            "color": null,
             "tier": 0,
             "shape": 1,
             "name": "Burnt Purple Dirt",
             "id": 136
         },
         {
-            "color": "red",
+            "color": null,
             "tier": 0,
             "shape": 1,
             "name": "Burnt Red Dirt",
             "id": 209
         },
         {
-            "color": "white",
+            "color": null,
             "tier": 0,
             "shape": 1,
             "name": "Burnt White Dirt",
             "id": 134
         },
         {
-            "color": "yellow",
+            "color": null,
             "tier": 0,
             "shape": 1,
             "name": "Burnt Yellow Dirt",
@@ -1226,7 +1226,7 @@
             "color": null,
             "tier": 0,
             "shape": 4,
-            "name": "Glass Penta",
+            "name": "Glass Hepta",
             "id": 367
         },
         {
@@ -1282,7 +1282,7 @@
             "color": "green",
             "tier": 3,
             "shape": 4,
-            "name": "Green Advanced Armor Penta",
+            "name": "Green Advanced Armor Hepta",
             "id": 373
         },
         {
@@ -1317,7 +1317,7 @@
             "color": "green",
             "tier": 4,
             "shape": 4,
-            "name": "Green Crystal Armor Penta",
+            "name": "Green Crystal Armor Hepta",
             "id": 530
         },
         {
@@ -1342,35 +1342,35 @@
             "id": 137
         },
         {
-            "color": "green",
+            "color": "green hazard",
             "tier": 0,
             "shape": 1,
             "name": "Green Hazard Armor",
             "id": 438
         },
         {
-            "color": "green",
+            "color": "green hazard",
             "tier": 0,
             "shape": 3,
             "name": "Green Hazard Armor Corner",
             "id": 651
         },
         {
-            "color": "green",
+            "color": "green hazard",
             "tier": 0,
             "shape": 4,
-            "name": "Green Hazard Armor Penta",
+            "name": "Green Hazard Armor Hepta",
             "id": 652
         },
         {
-            "color": "green",
+            "color": "green hazard",
             "tier": 0,
             "shape": 5,
             "name": "Green Hazard Armor Tetra",
             "id": 653
         },
         {
-            "color": "green",
+            "color": "green hazard",
             "tier": 0,
             "shape": 2,
             "name": "Green Hazard Armor Wedge",
@@ -1394,7 +1394,7 @@
             "color": "green",
             "tier": 1,
             "shape": 4,
-            "name": "Green Hull Penta",
+            "name": "Green Hull Hepta",
             "id": 626
         },
         {
@@ -1464,7 +1464,7 @@
             "color": "green",
             "tier": 2,
             "shape": 4,
-            "name": "Green Standard Armor Penta",
+            "name": "Green Standard Armor Hepta",
             "id": 389
         },
         {
@@ -1506,7 +1506,7 @@
             "color": "grey",
             "tier": 3,
             "shape": 4,
-            "name": "Grey Advanced Armor Penta",
+            "name": "Grey Advanced Armor Hepta",
             "id": 401
         },
         {
@@ -1541,7 +1541,7 @@
             "color": "grey",
             "tier": 1,
             "shape": 4,
-            "name": "Grey Hull Penta",
+            "name": "Grey Hull Hepta",
             "id": 601
         },
         {
@@ -1576,7 +1576,7 @@
             "color": "grey",
             "tier": 2,
             "shape": 4,
-            "name": "Grey Standard Armor Penta",
+            "name": "Grey Standard Armor Hepta",
             "id": 357
         },
         {
@@ -2101,7 +2101,7 @@
             "color": "orange",
             "tier": 3,
             "shape": 4,
-            "name": "Orange Advanced Armor Penta",
+            "name": "Orange Advanced Armor Hepta",
             "id": 434
         },
         {
@@ -2136,7 +2136,7 @@
             "color": "orange",
             "tier": 4,
             "shape": 4,
-            "name": "Orange Crystal Armor Penta",
+            "name": "Orange Crystal Armor Hepta",
             "id": 520
         },
         {
@@ -2178,7 +2178,7 @@
             "color": "orange",
             "tier": 1,
             "shape": 4,
-            "name": "Orange Hull Penta",
+            "name": "Orange Hull Hepta",
             "id": 636
         },
         {
@@ -2248,7 +2248,7 @@
             "color": "orange",
             "tier": 2,
             "shape": 4,
-            "name": "Orange Standard Armor Penta",
+            "name": "Orange Standard Armor Hepta",
             "id": 429
         },
         {
@@ -2558,7 +2558,7 @@
             "color": "purple",
             "tier": 3,
             "shape": 4,
-            "name": "Purple Advanced Armor Penta",
+            "name": "Purple Advanced Armor Hepta",
             "id": 371
         },
         {
@@ -2593,7 +2593,7 @@
             "color": "purple",
             "tier": 4,
             "shape": 4,
-            "name": "Purple Crystal Armor Penta",
+            "name": "Purple Crystal Armor Hepta",
             "id": 540
         },
         {
@@ -2635,7 +2635,7 @@
             "color": "purple",
             "tier": 1,
             "shape": 4,
-            "name": "Purple Hull Penta",
+            "name": "Purple Hull Hepta",
             "id": 616
         },
         {
@@ -2712,7 +2712,7 @@
             "color": "purple",
             "tier": 2,
             "shape": 4,
-            "name": "Purple Standard Armor Penta",
+            "name": "Purple Standard Armor Hepta",
             "id": 387
         },
         {
@@ -2866,7 +2866,7 @@
             "color": "red",
             "tier": 3,
             "shape": 4,
-            "name": "Red Advanced Armor Penta",
+            "name": "Red Advanced Armor Hepta",
             "id": 370
         },
         {
@@ -2901,7 +2901,7 @@
             "color": "red",
             "tier": 4,
             "shape": 4,
-            "name": "Red Crystal Armor Penta",
+            "name": "Red Crystal Armor Hepta",
             "id": 515
         },
         {
@@ -2950,7 +2950,7 @@
             "color": "red",
             "tier": 1,
             "shape": 4,
-            "name": "Red Hull Penta",
+            "name": "Red Hull Hepta",
             "id": 641
         },
         {
@@ -3034,7 +3034,7 @@
             "color": "red",
             "tier": 2,
             "shape": 4,
-            "name": "Red Standard Armor Penta",
+            "name": "Red Standard Armor Hepta",
             "id": 386
         },
         {
@@ -3643,7 +3643,7 @@
             "color": "white",
             "tier": 3,
             "shape": 4,
-            "name": "White Advanced Armor Penta",
+            "name": "White Advanced Armor Hepta",
             "id": 376
         },
         {
@@ -3678,7 +3678,7 @@
             "color": "white",
             "tier": 4,
             "shape": 4,
-            "name": "White Crystal Armor Penta",
+            "name": "White Crystal Armor Hepta",
             "id": 510
         },
         {
@@ -3720,7 +3720,7 @@
             "color": "white",
             "tier": 1,
             "shape": 4,
-            "name": "White Hull Penta",
+            "name": "White Hull Hepta",
             "id": 611
         },
         {
@@ -3790,7 +3790,7 @@
             "color": "white",
             "tier": 2,
             "shape": 4,
-            "name": "White Standard Armor Penta",
+            "name": "White Standard Armor Hepta",
             "id": 392
         },
         {
@@ -3839,7 +3839,7 @@
             "color": "yellow",
             "tier": 3,
             "shape": 4,
-            "name": "Yellow Advanced Armor Penta",
+            "name": "Yellow Advanced Armor Hepta",
             "id": 375
         },
         {
@@ -3874,7 +3874,7 @@
             "color": "yellow",
             "tier": 4,
             "shape": 4,
-            "name": "Yellow Crystal Armor Penta",
+            "name": "Yellow Crystal Armor Hepta",
             "id": 525
         },
         {
@@ -3916,7 +3916,7 @@
             "color": "yellow hazard",
             "tier": 0,
             "shape": 4,
-            "name": "Yellow Hazard Armor Penta",
+            "name": "Yellow Hazard Armor Hepta",
             "id": 649
         },
         {
@@ -3951,7 +3951,7 @@
             "color": "yellow",
             "tier": 1,
             "shape": 4,
-            "name": "Yellow Hull Penta",
+            "name": "Yellow Hull Hepta",
             "id": 631
         },
         {
@@ -4021,7 +4021,7 @@
             "color": "yellow",
             "tier": 2,
             "shape": 4,
-            "name": "Yellow Standard Armor Penta",
+            "name": "Yellow Standard Armor Hepta",
             "id": 391
         },
         {
@@ -4093,6 +4093,51 @@
             "shape": 1,
             "name": "Zercaner Ore Raw",
             "id": 490
+        },
+        {
+            "color": null,
+            "tier": 0,
+            "shape": 1,
+            "name": "Scaffold",
+            "id": 656
+        },
+        {
+            "color": null,
+            "tier": 0,
+            "shape": 1,
+            "name": "Decorative Charts",
+            "id": 657
+        },
+        {
+            "color": null,
+            "tier": 0,
+            "shape": 1,
+            "name": "Conduit (Blue)",
+            "id": 658
+        },
+        {
+            "color": null,
+            "tier": 0,
+            "shape": 1,
+            "door": true,
+            "name": "Forcefield (Red)",
+            "id": 659
+        },
+        {
+            "color": null,
+            "tier": 0,
+            "shape": 1,
+            "door": true,
+            "name": "Forcefield (Blue)",
+            "id": 660
+        },
+        {
+            "color": null,
+            "tier": 0,
+            "shape": 1,
+            "door": true,
+            "name": "Forcefield (Yellow)",
+            "id": 661
         }
     ],
     "armor_tiers": {
