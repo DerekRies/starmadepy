@@ -45,7 +45,7 @@ def blueprint():
     # print_logic(bp.logic)
     print bp.meta
     print '--------------------'
-    print bp.info
+    # print bp.info
 
 if __name__ == '__main__':
     # tutorial1()

@@ -171,3 +171,10 @@ class BitPacker:
         for bit_string in utils.split_every_nchars(self.bits, 8):
             byte = int(bit_string, 2)
             stream.writeUChar(byte)
+
+
+class TagParser:
+    """
+    Used to extract tags from the Blueprint meta files.
+    """
+    pass
