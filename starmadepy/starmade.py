@@ -3,6 +3,7 @@ import binascii
 import copy
 import pkgutil
 import os
+import tags
 
 
 from bisect import bisect_left
@@ -539,36 +540,33 @@ class Blueprint(BlockGroup):
             stream = BinaryStream(ifile)
             version = stream.readUInt32()
             docked_entries = []
-            tagtype = None
-            while tagtype != 1:
-                tagtype = stream.readUChar()
-                if tagtype == 1:
-                    print 'Finish'
-                    break
-                elif tagtype == 2:
-                    print 'SegManager'
-                    tag_v = stream.readUInt16()
-                    break
-                elif tagtype == 3:
-                    print 'Docking'
-                    dock_count = stream.readInt32()
-                    for i in xrange(dock_count):
-                        name = stream.readString()
-                        dock_pos = stream.readVec3Int32()
-                        dock_size = stream.readVec3F()
-                        dock_style = stream.readUInt16()
-                        dock_orientation = stream.readUChar()
-                        docked_entries.append({
-                            'name': name,
-                            'dockPos': dock_pos,
-                            'dockSize': dock_size,
-                            'dockStyle': dock_style,
-                            'dockOrientation': dock_orientation,
-                            })
-                    # break
+            # tagtype = None
+            tagtype = stream.readUChar()
+            tagroot = None
+            if tagtype == 3:
+                dock_count = stream.readInt32()
+                for i in xrange(dock_count):
+                    name = stream.readString()
+                    dock_pos = stream.readVec3Int32()
+                    dock_size = stream.readVec3F()
+                    dock_style = stream.readUInt16()
+                    dock_orientation = stream.readUChar()
+                    docked_entries.append({
+                        'name': name,
+                        'dockPos': dock_pos,
+                        'dockSize': dock_size,
+                        'dockStyle': dock_style,
+                        'dockOrientation': dock_orientation,
+                        })
+                byte_b = stream.readByte()
+                gzip = stream.readInt16()
+
+                tagparser = tags.TagParser(stream)
+                tagroot = tagparser.read()
         return {
             'version': version,
             'dockEntries': docked_entries,
+            'tagroot': tagroot
             }
 
     @classmethod

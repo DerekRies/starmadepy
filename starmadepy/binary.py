@@ -66,6 +66,9 @@ class BinaryStream:
             bits += byte_as_bits
         return bits
 
+    def readVec3Char(self):
+        return (self.readChar(), self.readChar(), self.readChar())
+
     def readVec3F(self):
         return (self.readFloat(), self.readFloat(), self.readFloat())
 
@@ -80,6 +83,10 @@ class BinaryStream:
 
     def readVec3Int32(self):
         return (self.readInt32(), self.readInt32(), self.readInt32())
+
+    def readVec4F(self):
+        return (self.readFloat(), self.readFloat(), self.readFloat(),
+            self.readFloat())
 
     def writeBytes(self, value):
         self.base_stream.write(value)
@@ -121,6 +128,11 @@ class BinaryStream:
         length = len(value)
         self.writeUInt16(length)
         self.pack(str(length) + 's', value)
+
+    def writeVec3Char(self, vec):
+        self.writeChar(vec[0])
+        self.writeChar(vec[1])
+        self.writeChar(vec[2])
 
     def writeVec3F(self, vec):
         self.writeFloat(vec[0])
@@ -171,10 +183,3 @@ class BitPacker:
         for bit_string in utils.split_every_nchars(self.bits, 8):
             byte = int(bit_string, 2)
             stream.writeUChar(byte)
-
-
-class TagParser:
-    """
-    Used to extract tags from the Blueprint meta files.
-    """
-    pass
