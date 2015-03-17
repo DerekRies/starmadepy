@@ -86,7 +86,7 @@ class BinaryStream:
 
     def readVec4F(self):
         return (self.readFloat(), self.readFloat(), self.readFloat(),
-            self.readFloat())
+                self.readFloat())
 
     def writeBytes(self, value):
         self.base_stream.write(value)

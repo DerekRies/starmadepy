@@ -245,7 +245,12 @@ class TestBlueprint:
         bp = Blueprint.fromFolder(bp_file)
         logic = bp.logic
         assert logic.get('size') == 2
-        
+
+    def test_load_meta(self):
+        bp_file = 'starmadepy/data/test-blueprints/TridentBattleCruiser1'
+        bp = Blueprint.fromFolder(bp_file)
+        docked_entities = bp.meta.get('dockEntries')
+        assert len(docked_entities) == 2
 
 
 @pytest.mark.style
@@ -255,5 +260,6 @@ class TestStyle:
         result = pep8style.check_files([
             'starmadepy/starmade.py',
             'starmadepy/binary.py',
+            'starmadepy/tags.py',
             'starmadepy/utils.py'])
         assert result.total_errors == 0

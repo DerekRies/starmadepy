@@ -33,7 +33,11 @@ TAG_INT = 253
 TAG_SHORT = 254
 TAG_BYTE = 255
 
+
 class TagParser:
+    """
+    Test
+    """
 
     def __init__(self, stream):
         self.stream = stream
@@ -45,7 +49,7 @@ class TagParser:
             item = self.parse_tag(tag)
             try:
                 tag = self.stream.readUChar()
-            except struct.error: # Missing Tag Finish Char
+            except struct.error:  # Missing Tag Finish Char
                 tag = TAG_FINISH
             all_tags.append(item)
         return all_tags
@@ -200,7 +204,7 @@ class TagParser:
 
         elif tag == TAG_INT3:
             return self.stream.readVec3Int32()
-            
+
         elif tag == TAG_STR_BYTE3:
             return {
                 'name': self.stream.readString(),

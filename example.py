@@ -44,6 +44,7 @@ def blueprint():
     bp = starmade.Blueprint.fromFolder(blueprint)
     # print_logic(bp.logic)
     print bp.meta
+    print "Found %s docked entities" % len(bp.meta['dockEntries'])
 
 if __name__ == '__main__':
     # tutorial1()
