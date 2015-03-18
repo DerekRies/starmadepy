@@ -41,9 +41,13 @@ def blueprint():
     # blueprint = 'starmadepy/data/test-blueprints/Isanth-VI'
     # blueprint = 'starmadepy/data/test-blueprints/bptest4'
     blueprint = 'starmadepy/data/test-blueprints/TridentBattleCruiser1'
+    blueprint = 'starmadepy/data/test-blueprints/bp_meta_test'
     bp = starmade.Blueprint.fromFolder(blueprint)
     # print_logic(bp.logic)
-    print bp.meta
+    import pprint
+    # print bp.meta.get('tagroot')
+    pp = pprint.PrettyPrinter()
+    pp.pprint(bp.meta.get('tagroot'))
     print "Found %s docked entities" % len(bp.meta['dockEntries'])
 
 if __name__ == '__main__':
