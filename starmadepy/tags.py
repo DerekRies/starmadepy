@@ -102,6 +102,7 @@ class TagParser:
         data = []
         while next_tag != TAG_FINISH:
             item = self.parse_tag(next_tag)
+            # Structure the data properly here
             data.append(item)
             next_tag = self.stream.readUChar()
         return data

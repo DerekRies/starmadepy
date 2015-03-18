@@ -1,7 +1,7 @@
 import pytest
 import os
 import pep8
-from starmadepy.starmade import Block, Template, Blueprint, shape, tier
+from starmadepy.starmade import Block, Template, Blueprint, shape, tier, get_inventory, get_filters
 
 
 
@@ -251,6 +251,14 @@ class TestBlueprint:
         bp = Blueprint.fromFolder(bp_file)
         docked_entities = bp.meta.get('dockEntries')
         assert len(docked_entities) == 2
+
+    def test_read_storage_filters(self):
+        # Should be 9999 activation modules
+        filter_list = [[405, 9999]]
+        # Should be 9999 activation modules
+        filter_list2 = [[405, 9999], [263, 5000]]
+        filters1 = get_filters(filter_list)
+        assert filters1.get('Activation Module') == 9999
 
 
 @pytest.mark.style

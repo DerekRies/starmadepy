@@ -39,6 +39,30 @@ def tier(t):
     return ARMOR[t.lower()]
 
 
+def get_inventory(storage):
+    """
+    Helper function to read the inventory of a storage box or factory
+    stored in a meta file for blueprints. (And possibily other files
+    later)
+    """
+    pass
+
+
+def get_filters(filter_list):
+    """
+    Helper function to read the filters attached to a storage box that
+    are stored in a meta file for blueprints. (And possibly other files
+    later)
+    """
+    filters = {}
+    for block_count_pair in filter_list:
+        block_id = block_count_pair[0]
+        block_count = block_count_pair[1]
+        block_name = Block.map_id_to_name(block_id)
+        filters[block_name] = block_count
+    return filters
+
+
 class Block:
 
     """Block class serves two roles
@@ -563,10 +587,44 @@ class Blueprint(BlockGroup):
 
                 tagparser = tags.TagParser(stream)
                 tagroot = tagparser.read()
+                # format the tagroot into a nice data structure
+                container = {}
+                tag_container = tagroot[0].get('value')
+                # print tag_container
+                tag_map = {
+                    'pw': 'power',
+                    'sh': 'shield',
+                }
+                for item in tag_container:
+                    if type(item) == dict:
+                        name = item['name']
+                        if name in tag_map:
+                            name = tag_map[name]
+                        container[name] = item['value']
+                container['storages'] = []
+                for inv in container['controllerStructure']:
+                    inv = inv.get('value')
+                    storage = {}
+                    for pair in inv:
+                        storage[pair['name']] = pair['value']
+                    stash = storage['stash']
+                    storage['inventory'] = get_inventory(stash[1])
+                    storage['filters'] = get_filters(stash[0][1])
+                    # Older blueprints will only have 2 items in the
+                    # stash portion (ex: [0, [filters]]) while newer
+                    # blueprints allow storages to be named and will
+                    # have 3 items
+                    # ex: [0, [filters], 'name']
+                    if len(stash[0]) < 3:
+                        storage['name'] = ''
+                    else:
+                        storage['name'] = stash[0][2]
+                    container['storages'].append(storage)
         return {
             'version': version,
             'dockEntries': docked_entries,
-            'tagroot': tagroot
+            'tagroot': tagroot,
+            'container': container,
             }
 
     @classmethod
