@@ -39,13 +39,28 @@ def tier(t):
     return ARMOR[t.lower()]
 
 
-def get_inventory(storage):
+def get_inventory(inv_list):
     """
     Helper function to read the inventory of a storage box or factory
     stored in a meta file for blueprints. (And possibily other files
     later)
+    Inventory is stored in 3 separate lists, the first is a list of slot
+    ids. The second is a list of block-ids indexed by slot_id. The third
+    being the number of blocks of that type.0
     """
-    pass
+    print inv_list
+    inventory = []
+    for slot_id in inv_list[0]:
+        block_id = inv_list[1][slot_id]
+        block_count = inv_list[2][slot_id]
+        item = {
+            'name': Block.map_id_to_name(block_id),
+            'id': block_id,
+            'count': block_count,
+            'slot': slot_id
+        }
+        inventory.append(item)
+    return inventory
 
 
 def get_filters(filter_list):
@@ -608,7 +623,7 @@ class Blueprint(BlockGroup):
                     for pair in inv:
                         storage[pair['name']] = pair['value']
                     stash = storage['stash']
-                    storage['inventory'] = get_inventory(stash[1])
+                    storage['inventory'] = get_inventory(stash[1].get('value'))
                     storage['filters'] = get_filters(stash[0][1])
                     # Older blueprints will only have 2 items in the
                     # stash portion (ex: [0, [filters]]) while newer

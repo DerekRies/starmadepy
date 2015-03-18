@@ -41,7 +41,7 @@ def blueprint():
     # blueprint = 'starmadepy/data/test-blueprints/Isanth-VI'
     # blueprint = 'starmadepy/data/test-blueprints/bptest4'
     # blueprint = 'starmadepy/data/test-blueprints/TridentBattleCruiser1'
-    blueprint = 'starmadepy/data/test-blueprints/bp_meta_test'
+    blueprint = 'starmadepy/data/test-blueprints/bp_meta_test3'
     bp = starmade.Blueprint.fromFolder(blueprint)
     # print_logic(bp.logic)
     import pprint

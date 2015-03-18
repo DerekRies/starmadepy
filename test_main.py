@@ -260,6 +260,18 @@ class TestBlueprint:
         filters1 = get_filters(filter_list)
         assert filters1.get('Activation Module') == 9999
 
+    def test_read_storage_inventory(self):
+        inv_list = [[1, 0], [656, 5], [15, 31]]
+        block_counts = {
+            'Grey Standard Armor': 31,
+            'Scaffold': 15
+        }
+        inventory = get_inventory(inv_list)
+        assert len(inventory) == 2
+        for item in inventory:
+            name = item.get('name')
+            assert block_counts[name] == item.get('count')
+
 
 @pytest.mark.style
 class TestStyle:
