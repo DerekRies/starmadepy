@@ -4,7 +4,7 @@ backports.ssl-match-hostname==3.4.0.2
 certifi==14.5.14
 docutils==0.12
 ghp-import==0.4.1
-Jinja2==2.7.3
+Jinja2==2.11.3
 livereload==2.3.2
 Markdown==2.4.1
 MarkupSafe==0.23
