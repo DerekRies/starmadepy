@@ -11,7 +11,7 @@ MarkupSafe==0.23
 mkdocs==0.11.1
 pathtools==0.1.2
 pep8==1.6.1
-py==1.4.26
+py==1.10.0
 Pygments==2.0.2
 pytest==2.6.4
 pytest-sugar==0.3.6
