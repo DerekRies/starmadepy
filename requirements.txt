@@ -1,7 +1,7 @@
 argh==0.26.1
 autopep8==1.1
 backports.ssl-match-hostname==3.4.0.2
-certifi==14.5.14
+certifi==2022.12.7
 docutils==0.12
 ghp-import==0.4.1
 Jinja2==2.7.3
